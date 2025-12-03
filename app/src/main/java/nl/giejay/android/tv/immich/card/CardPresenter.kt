@@ -2,26 +2,72 @@ package nl.giejay.android.tv.immich.card
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.LayerDrawable
 import android.view.ContextThemeWrapper
+import android.view.Gravity
+import android.view.View
 import android.widget.ImageView
+import androidx.leanback.widget.BaseCardView
 import androidx.leanback.widget.ImageCardView
 import com.bumptech.glide.Glide
 import nl.giejay.android.tv.immich.R
 import nl.giejay.android.tv.immich.shared.presenter.AbstractPresenter
+import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import timber.log.Timber
 
-
+/**
+ * Presenter ESTÁNDAR para Fotos y Álbumes.
+ * - Soporta ocultar nombres.
+ * - Añade icono de Play usando FOREGROUND (sin romper el layout).
+ */
 open class CardPresenter(context: Context, style: Int = R.style.DefaultCardTheme) :
     AbstractPresenter<ImageCardView, ICard>(ContextThemeWrapper(context, style)) {
 
     override fun onBindViewHolder(card: ICard, cardView: ImageCardView) {
-        loadImage(card, cardView)
-
         cardView.tag = card
-        cardView.titleText = card.title
-        if (card.description != "") {
-            cardView.contentText = card.description
+        
+        // 1. LEER PREFERENCIA
+        val showNames = try {
+            PreferenceManager.get(nl.giejay.android.tv.immich.shared.prefs.SHOW_FILE_NAMES_GRID)
+        } catch (e: Exception) {
+            true
         }
+
+        // 2. CONFIGURAR EL TIPO DE TARJETA
+        if (showNames) {
+            cardView.cardType = BaseCardView.CARD_TYPE_INFO_UNDER
+            cardView.titleText = card.title
+            cardView.contentText = card.description
+        } else {
+            cardView.cardType = BaseCardView.CARD_TYPE_MAIN_ONLY
+            cardView.titleText = null
+            cardView.contentText = null
+        }
+        
+        // 3. ICONO DE VÍDEO (Usando Foreground con !!)
+        if (card is Card && card.isVideo) {
+            val playIcon = context.getDrawable(android.R.drawable.ic_media_play)?.mutate()
+            playIcon?.setTint(Color.WHITE)
+            
+            if (playIcon != null) {
+                // Capa con el icono
+                val layerDrawable = LayerDrawable(arrayOf(playIcon))
+                
+                // Posicionamiento: Abajo a la derecha
+                layerDrawable.setLayerGravity(0, Gravity.BOTTOM or Gravity.END)
+                // Margen
+                layerDrawable.setLayerInset(0, 0, 20, 20, 20) 
+                
+                // APLICAMOS AL PRIMER PLANO (Aquí estaba el error, añadimos !!)
+                cardView.mainImageView!!.foreground = layerDrawable
+            }
+        } else {
+            // Limpiamos si no es vídeo (Añadimos !!)
+            cardView.mainImageView!!.foreground = null
+        }
+        
+        loadImage(card, cardView)
         setSelected(cardView, card.selected)
     }
 
@@ -31,48 +77,33 @@ open class CardPresenter(context: Context, style: Int = R.style.DefaultCardTheme
             return
         }
         try {
-            Glide.with(context).clear((viewHolder.view as ImageCardView).mainImageView!!)
+            val imgView = (viewHolder.view as ImageCardView).mainImageView!!
+            Glide.with(context).clear(imgView)
+            // Limpiamos el foreground también (Añadimos !!)
+            imgView.foreground = null
         } catch (e: IllegalArgumentException){
             Timber.e(e)
         }
     }
 
     open fun loadImage(card: ICard, cardView: ImageCardView) {
-        card.thumbnailUrl?.let {
-            if(it.startsWith("http")){
+        val url = card.thumbnailUrl
+        // Añadimos !! aquí también por seguridad
+        val imageView = cardView.mainImageView!!
+        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+
+        if (!url.isNullOrBlank()) {
+            if(url.startsWith("http")){
                 Glide.with(context)
                     .asBitmap()
-                    .centerInside()
-                    .load(it)
-                    .into(cardView.mainImageView!!)
+                    .load(url)
+                    .into(imageView)
             } else {
-                cardView.mainImageView!!.scaleType = ImageView.ScaleType.CENTER_INSIDE
-                val resourceId = context.resources.getIdentifier(it, "drawable",
-                    context.packageName);
-                cardView.mainImageView!!.setImageResource(resourceId)
+                val resourceId = context.resources.getIdentifier(url, "drawable", context.packageName)
+                if (resourceId != 0) imageView.setImageResource(resourceId)
             }
-//                .addListener(object : RequestListener<Bitmap> {
-//                    override fun onLoadFailed(
-//                        e: GlideException?,
-//                        model: Any?,
-//                        target: Target<Bitmap>?,
-//                        isFirstResource: Boolean
-//                    ): Boolean {
-//                        return false
-//                    }
-//
-//                    override fun onResourceReady(
-//                        resource: Bitmap?,
-//                        model: Any?,
-//                        target: Target<Bitmap>?,
-//                        dataSource: DataSource?,
-//                        isFirstResource: Boolean
-//                    ): Boolean {
-//                        Timber.i("Loaded card image for: ${card.id}")
-//                        return false
-//                    }
-//
-//                })
+        } else {
+            imageView.setImageDrawable(null)
         }
     }
 

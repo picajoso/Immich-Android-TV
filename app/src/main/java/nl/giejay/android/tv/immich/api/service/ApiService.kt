@@ -4,7 +4,8 @@ import nl.giejay.android.tv.immich.api.model.Album
 import nl.giejay.android.tv.immich.api.model.AlbumDetails
 import nl.giejay.android.tv.immich.api.model.Asset
 import nl.giejay.android.tv.immich.api.model.Bucket
-import nl.giejay.android.tv.immich.api.model.BucketResponse
+// Importante: importamos nuestra nueva clase de respuesta
+import nl.giejay.android.tv.immich.api.model.BucketResponse 
 import nl.giejay.android.tv.immich.api.model.PeopleResponse
 import nl.giejay.android.tv.immich.api.model.SearchRequest
 import nl.giejay.android.tv.immich.api.model.SearchResponse
@@ -14,7 +15,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-
 
 interface ApiService {
     @POST("search/metadata")
@@ -30,16 +30,22 @@ interface ApiService {
     suspend fun listPeople(): Response<PeopleResponse>
 
     @GET("albums/{albumId}")
-    suspend fun listAssetsFromAlbum(@Path("albumId") albumId: String): Response<AlbumDetails>
+    suspend fun listAssetsFromAlbum(@Path("albumId") albumId: String?): Response<AlbumDetails>
 
     @GET("timeline/buckets")
-    suspend fun listBuckets(@Query("albumId") albumId: String, @Query("size") size: String = "MONTH", @Query("order") order: String = "desc"): Response<List<Bucket>>
+    suspend fun listBuckets(@Query("albumId") albumId: String?, @Query("size") size: String = "MONTH", @Query("order") order: String = "desc"): Response<List<Bucket>>
+
+    // AQUÍ ESTÁ EL CAMBIO IMPORTANTE: Devuelve BucketResponse
+    @GET("timeline/bucket")
+    suspend fun getBucket(
+        @Query("albumId") albumId: String?, 
+        @Query("timeBucket") timeBucket: String, 
+        @Query("size") size: String = "MONTH", 
+        @Query("order") order: String = "desc"
+    ): Response<BucketResponse>
 
     @GET("timeline/bucket")
-    suspend fun getBucket(@Query("albumId") albumId: String, @Query("timeBucket") timeBucket: String, @Query("size") size: String = "MONTH",  @Query("order") order: String = "desc"): Response<List<Asset>>
-
-    @GET("timeline/bucket")
-    suspend fun getBucketV2(@Query("albumId") albumId: String, @Query("timeBucket") timeBucket: String, @Query("size") size: String = "MONTH",  @Query("order") order: String = "desc"): Response<BucketResponse>
+    suspend fun getBucketV2(@Query("albumId") albumId: String?, @Query("timeBucket") timeBucket: String, @Query("size") size: String = "MONTH"): Response<BucketResponse>
 
     @GET("assets/{id}")
     suspend fun getAsset(@Path("id") id: String): Response<Asset>

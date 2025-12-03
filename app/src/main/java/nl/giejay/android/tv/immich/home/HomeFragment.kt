@@ -22,6 +22,7 @@ import nl.giejay.android.tv.immich.assets.FolderFragment
 import nl.giejay.android.tv.immich.assets.RandomAssetsFragment
 import nl.giejay.android.tv.immich.assets.RecentAssetsFragment
 import nl.giejay.android.tv.immich.assets.SimilarTimeAssetsFragment
+import nl.giejay.android.tv.immich.assets.TimelineFragment
 import nl.giejay.android.tv.immich.people.PeopleFragment
 import nl.giejay.android.tv.immich.settings.SettingsFragment
 import nl.giejay.android.tv.immich.shared.fragment.GridFragment
@@ -129,7 +130,9 @@ class HomeFragment : BrowseSupportFragment() {
             Header("People") { PeopleFragment() },
             Header("Recent") { RecentAssetsFragment() },
             Header("Seasonal") { SimilarTimeAssetsFragment() },
+            Header("Timeline") { nl.giejay.android.tv.immich.assets.TimelineBucketPickerFragment() },            
             Header("Folders") { FolderFragment() },
+            // ANTES Header("Timeline") { TimelineFragment() },
             Header("Edit") { GridFragment(hideProgressBar = true) },
             Header("Settings") { SettingsFragment() },
         )

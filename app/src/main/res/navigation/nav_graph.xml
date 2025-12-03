@@ -209,6 +209,17 @@
         <action
             android:id="@+id/action_home_to_donate"
             app:destination="@id/donateFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_timelineFragment"
+            app:destination="@id/timelineFragment" />
+        <action
+            android:id="@+id/action_timeline_to_picker"
+            app:destination="@id/timelineBucketPickerFragment" />
+        <action
+            android:id="@+id/action_picker_to_timeline"
+            app:destination="@id/timelineFragment"
+            app:popUpTo="@id/timelineFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <dialog
@@ -252,6 +263,37 @@
             android:id="@+id/action_noFirebaseFragment_to_browseFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/noFirebaseFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+   <fragment
+        android:id="@+id/timelineFragment"
+        android:name="nl.giejay.android.tv.immich.assets.TimelineFragment"
+        android:label="Timeline">
+        
+        <argument
+            android:name="timeBucket"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+
+        <action
+            android:id="@+id/action_timeline_to_picker"
+            app:destination="@id/timelineBucketPickerFragment" />
+            
+        <action
+            android:id="@+id/action_timeline_to_photo_slider"
+            app:destination="@id/photoSlider" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/timelineBucketPickerFragment"
+        android:name="nl.giejay.android.tv.immich.assets.TimelineBucketPickerFragment"
+        android:label="Select Date">
+        
+        <action
+            android:id="@+id/action_picker_to_timeline"
+            app:destination="@id/timelineFragment"
+            app:popUpTo="@id/timelineFragment"
             app:popUpToInclusive="true" />
     </fragment>
 </navigation>

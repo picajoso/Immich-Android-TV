@@ -26,6 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import nl.giejay.android.tv.immich.api.model.BucketResponse
 
 data class ApiClientConfig(
     val hostName: String,
@@ -136,24 +137,32 @@ class ApiClient(private val config: ApiClientConfig) {
         asset.tags?.none { t -> t.name == "exclude_immich_tv" } ?: true
     }
 
-    suspend fun listBuckets(albumId: String, order: PhotosOrder): Either<String, List<Bucket>> {
+   suspend fun listBuckets(albumId: String, order: PhotosOrder): Either<String, List<Bucket>> {
+        // CORRECCIÓN: Si albumId está vacío, enviamos null para evitar el error 400
+        val safeAlbumId = if (albumId.isBlank()) null else albumId
+
         return executeAPICall(200) {
-            service.listBuckets(albumId = albumId, order = if (order == PhotosOrder.OLDEST_NEWEST) "asc" else "desc")
+            service.listBuckets(
+                albumId = safeAlbumId, 
+                order = if (order == PhotosOrder.OLDEST_NEWEST) "asc" else "desc"
+            )
         }
     }
 
-    suspend fun getAssetsForBucket(albumId: String, bucket: String, order: PhotosOrder): Either<String, List<Asset>> {
-        val response = executeAPICall(200) {
-            service.getBucketV2(albumId = albumId, timeBucket = bucket, order = if (order == PhotosOrder.OLDEST_NEWEST) "asc" else "desc")
-        }.map {
-            it.id.pmap { t -> service.getAsset(t).body() }.filterNotNull().toList()
+
+   suspend fun getAssetsForBucket(albumId: String, bucket: String, order: PhotosOrder): Either<String, List<Asset>> {
+        val safeAlbumId = if (albumId.isBlank()) null else albumId
+
+        // AÑADIDO <BucketResponse> PARA FORZAR EL TIPO
+        return executeAPICall<BucketResponse>(200) {
+            service.getBucket(
+                albumId = safeAlbumId,
+                timeBucket = bucket,
+                order = if (order == PhotosOrder.OLDEST_NEWEST) "asc" else "desc"
+            )
+        }.map { response -> 
+            response.toAssets() 
         }
-        if (response.isLeft()) {
-            return executeAPICall(200) {
-                service.getBucket(albumId = albumId, timeBucket = bucket, order = if (order == PhotosOrder.OLDEST_NEWEST) "asc" else "desc")
-            }
-        }
-        return response
     }
 
     suspend fun listFolders(): Either<String, Folder> {

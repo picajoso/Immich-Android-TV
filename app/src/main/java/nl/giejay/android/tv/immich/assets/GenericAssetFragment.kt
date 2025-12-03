@@ -116,6 +116,7 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
     }
 
     override fun createCard(a: Asset): Card {
+        // Usamos la función de extensión que vamos a mejorar en el paso 2
         return a.toCard()
     }
 }

@@ -147,6 +147,7 @@ data object SLIDER_METADATA_CUSTOMIZER : ActionPref("Customize metadata", "Confi
 })
 
 data object SLIDER_ONLY_USE_THUMBNAILS : BooleanPref(true, "Use high resolution thumbnails", "Use high resolution thumbnails instead of native/full images. Will dramatically speed up loading.")
+data object SHOW_FILE_NAMES_GRID : BooleanPref(true, "Show file names in grid", "Show the file name below photos in the grid view")
 data object SLIDER_MERGE_PORTRAIT_PHOTOS : BooleanPref(true, "Merge portrait photos", "Show two portrait photos next to each other")
 data object SLIDER_MAX_CUT_OFF_WIDTH : IntSeekbarPref(20,
     "Safe Center Crop max cutoff height %",
@@ -334,6 +335,7 @@ data object ViewPrefScreen : PrefScreen("View Settings", "view",
             SIMILAR_ASSETS_PERIOD_DAYS,
             RECENT_ASSETS_MONTHS_BACK,
             EXCLUDE_ASSETS_IN_ALBUM,
+            SHOW_FILE_NAMES_GRID,
             LOAD_BACKGROUND_IMAGE))
     )
 )

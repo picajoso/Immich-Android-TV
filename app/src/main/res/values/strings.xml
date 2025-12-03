@@ -39,6 +39,11 @@
     <string name="unknown_error">Unknown error</string>
     <string name="sign_in_intro">Without any changes, this app uses local authorization (MockAuthClient). You can log in using "%1$s" as the email and any non-empty string as the password. To update the app to use remote auth, see the RemoteAuthClient class.</string>
 
+    <!-- My Immich Server strings -->
+    <string name="host_name">http://192.168.31.29:8081</string>
+    <string name="api_key">7tlhZtsxCJgZCwBhDuUSYwBRNG6wocjh2o5fPtmqnts</string>
+    <string name="authentication_url">http://192.168.31.29:8081/api</string>
+
     <!-- Channel strings -->
     <string name="default_home_screen_channel_name">Example Channel</string>
     <string name="default_home_screen_channel_description">An example of a default home screen channel</string>

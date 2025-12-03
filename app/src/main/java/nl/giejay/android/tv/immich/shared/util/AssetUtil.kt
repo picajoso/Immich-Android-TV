@@ -25,9 +25,7 @@ fun List<Asset>.toSliderItems(keepOrder: Boolean, mergePortrait: Boolean): List<
             val first = queue.removeAt(0)
             val firstDate = first.fileModifiedAt?.time
 
-            // pick the second portrait image that is most furthest away in time to the first one
             val second = if (first.people?.isNotEmpty() == true && firstDate != null) {
-                // Try strict match: same people size and city
                 queue.filter { candidate ->
                     candidate.people?.size == first.people.size &&
                             candidate.people.firstOrNull()?.id == first.people.first().id &&
@@ -36,14 +34,13 @@ fun List<Asset>.toSliderItems(keepOrder: Boolean, mergePortrait: Boolean): List<
                             candidate.exifInfo.dateTimeOriginal != null
                 }.maxByOrNull { candidate ->
                     kotlin.math.abs(candidate.exifInfo!!.dateTimeOriginal!!.time - firstDate)
-                } ?: // Fallback: only same people id
-                queue.filter { candidate ->
+                } ?: queue.filter { candidate ->
                     candidate.people?.firstOrNull()?.id == first.people.first().id &&
                             candidate.exifInfo?.dateTimeOriginal != null
                 }.maxByOrNull { candidate ->
                     kotlin.math.abs(candidate.exifInfo!!.dateTimeOriginal!!.time - firstDate)
                 }
-            } else null // no people or date info, or simply no match with the first, just add a random one next to it
+            } else null
 
             if (second != null) {
                 portraitSliders.add(SliderItemViewHolder(first.toSliderItem(), second.toSliderItem()))
@@ -97,7 +94,6 @@ private fun formatDate(date: Date): String {
     val isEnglish = locale.language == "en"
     val day = calendar[Calendar.DATE]
     val formatString = if (isEnglish) {
-        // English: Friday, 7th April 2006
         when (day) {
             1, 21, 31 -> "EEEE, d'st' MMMM yyyy"
             2, 22 -> "EEEE, d'nd' MMMM yyyy"
@@ -105,7 +101,6 @@ private fun formatDate(date: Date): String {
             else -> "EEEE, d'th' MMMM yyyy"
         }
     } else {
-        // All other locales: Freitag, 7. April 2006
         "EEEE, d. MMMM yyyy"
     }
     return SimpleDateFormat(formatString, locale).format(date)
@@ -121,10 +116,14 @@ fun List<Asset>.toCards(): List<Card> {
     }
 }
 
+// CORREGIDA: Ahora detecta correctamente el VIDEO y lo guarda en la Card
 fun Asset.toCard(): Card {
-    return Card(this.deviceAssetId ?: "",
-        this.exifInfo?.description ?: "",
-        this.id,
-        ApiUtil.getThumbnailUrl(this.id, "thumbnail"),
-        ApiUtil.getThumbnailUrl(this.id, "preview"))
+    return Card(
+        title = this.originalFileName ?: "",
+        description = this.exifInfo?.description ?: "",
+        id = this.id,
+        thumbnailUrl = ApiUtil.getThumbnailUrl(this.id, "thumbnail"),
+        backgroundUrl = ApiUtil.getThumbnailUrl(this.id, "preview"),
+        isVideo = this.type == "VIDEO" // <--- ESTO ES CRÍTICO
+    )
 }
