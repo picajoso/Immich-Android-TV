@@ -46,6 +46,12 @@ class ApiClient(private val config: ApiClientConfig) {
             return apiClient!!
         }
 
+        // --- AÑADIR ESTA FUNCIÓN ---
+        fun invalidate() {
+            apiClient = null
+        }
+        // ---------------------------
+
         val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
     }
 

@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import nl.giejay.android.tv.immich.api.ApiClient
 import nl.giejay.android.tv.immich.api.ApiClientConfig
+import nl.giejay.android.tv.immich.assets.FavoriteCache
 import nl.giejay.android.tv.immich.shared.prefs.API_KEY
 import nl.giejay.android.tv.immich.shared.prefs.DEBUG_MODE
 import nl.giejay.android.tv.immich.shared.prefs.DISABLE_SSL_VERIFICATION
@@ -33,35 +34,16 @@ class ImmichMediaSlider : MediaSliderFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // --- FIX: CONEXIÓN CORRECTA DEL CABLE ---
-        // Conectamos el evento de la Vista con tu lógica existente de API
         this.onAssetFavoriteChanged = { itemHolder, isFavorite ->
-            // itemHolder es el SliderItemViewHolder que viene de la vista
-            // Necesitamos pasarle a performToggleFavorite los datos exactos que pide
-            
             if (view is MediaSliderView) {
-                // Reutilizamos la lógica que ya tenías escrita abajo
-                // Nota: isFavorite ya viene invertido desde la vista, pero performToggleFavorite
-                // lo invierte de nuevo basándose en el objeto, así que primero actualizamos el objeto
-                // para que la lógica de performToggleFavorite no lo invierta dos veces erróneamente.
-                
-                // Opción segura: Llamar a performToggleFavorite forzando el estado o dejando que él lo gestione.
-                // Como performToggleFavorite hace "val newStatus = !sliderItem.isFavorite", 
-                // y la vista YA cambió el visual, vamos a dejar que perform haga la llamada a API y confirme.
-                
-                // Simplemente pasamos los datos:
                 val item = itemHolder.mainItem
                 val id = itemHolder.ids().firstOrNull()
                 
                 if (id != null) {
-                    // IMPORTANTE: En la vista ya cambiamos el booleano visualmente para que fuera rápido.
-                    // Pero performToggleFavorite usa el valor actual del objeto para invertirlo (!isFavorite).
-                    // Para que no se líe, le pasamos el objeto tal cual.
                     performToggleFavorite(id, item, view)
                 }
             }
         }
-        // ----------------------------------------
 
         Timber.i("Loading ${this.javaClass.simpleName}")
 
@@ -84,6 +66,41 @@ class ImmichMediaSlider : MediaSliderFragment() {
         loadMediaSliderView(config)
 
         setupKeyInterceptor(view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        
+        // Aplicar cache global a los items del slider
+        Timber.d("VISOR: onResume - Aplicando cache a ${config.items.size} items")
+        var updatedCount = 0
+        
+        config.items.forEach { itemHolder ->
+            val ids = itemHolder.ids()
+            ids.forEach { assetId ->
+                val cachedValue = FavoriteCache.overrides[assetId]
+                if (cachedValue != null && itemHolder.mainItem.isFavorite != cachedValue) {
+                    itemHolder.mainItem.isFavorite = cachedValue
+                    updatedCount++
+                    Timber.d("VISOR: Item $assetId actualizado desde cache -> $cachedValue")
+                }
+            }
+        }
+        
+        if (updatedCount > 0) {
+            Timber.d("VISOR: Aplicados $updatedCount cambios del cache")
+            
+            // Forzar actualización visual usando el método correcto
+            view?.let { currentView ->
+                if (currentView is MediaSliderView) {
+                    // Post para asegurar que la vista está lista
+                    currentView.post {
+                        currentView.updateFavoriteIcon()
+                        Timber.d("VISOR: Icono de favorito refrescado")
+                    }
+                }
+            }
+        }
     }
 
     private fun setupApiClient() {
@@ -120,10 +137,6 @@ class ImmichMediaSlider : MediaSliderFragment() {
     }
 
     private fun performToggleFavorite(assetId: String, sliderItem: nl.giejay.mediaslider.model.SliderItem, view: MediaSliderView) {
-        // Calculamos el nuevo estado deseado (invertir el actual)
-        // OJO: Si vienes del click de la estrella, visualmente ya cambió, pero el objeto sliderItem
-        // aún puede tener el valor viejo o nuevo dependiendo de si lo actualizaste en la View.
-        // Asumimos que aquí manda la API.
         val newStatus = !sliderItem.isFavorite
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -131,29 +144,26 @@ class ImmichMediaSlider : MediaSliderFragment() {
                 { error -> 
                     withContext(Dispatchers.Main) {
                         Toast.makeText(requireContext(), "Error: $error", Toast.LENGTH_SHORT).show()
-                        // Opcional: Si falló, revertir el icono en la vista
-                        // view.updateFavoriteIcon() 
                     }
                 },
                 { _ ->
-                    // ÉXITO: Actualizamos todo
                     withContext(Dispatchers.Main) {
-                        // 1. Actualizamos modelo local (fuente de verdad en memoria)
                         sliderItem.isFavorite = newStatus
-                        
-                        // 2. Refrescamos el icono visualmente (por si acaso no coincidía)
                         view.updateFavoriteIcon()
                         
-                        // 3. Avisamos al usuario
                         val msg = if (newStatus) "❤️ Favorito" else "💔 No Favorito"
                         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
 
-                        // 4. AVISAMOS AL GRID (LA CLAVE DE TODO)
-                        // Esto envía el dato a la pantalla anterior
+                        FavoriteCache.overrides[assetId] = newStatus
+                        Timber.d("VISOR: Guardado en FavoriteCache: $assetId -> $newStatus")
+                        Timber.d("VISOR: Cache ahora tiene ${FavoriteCache.overrides.size} elementos")
+                        
                         setFragmentResult("asset_favorite_changed", bundleOf(
                             "assetId" to assetId,
                             "isFavorite" to newStatus
                         ))
+                        
+                        Timber.d("VISOR: Evento enviado")
                     }
                 }
             )

@@ -28,6 +28,7 @@ import nl.giejay.android.tv.immich.settings.SettingsFragment
 import nl.giejay.android.tv.immich.shared.fragment.GridFragment
 import nl.giejay.android.tv.immich.shared.prefs.HIDDEN_HOME_ITEMS
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
+import nl.giejay.android.tv.immich.assets.IntegratedTimelineFragment
 import timber.log.Timber
 
 class HomeFragment : BrowseSupportFragment() {
@@ -130,7 +131,8 @@ class HomeFragment : BrowseSupportFragment() {
             Header("People") { PeopleFragment() },
             Header("Recent") { RecentAssetsFragment() },
             Header("Seasonal") { SimilarTimeAssetsFragment() },
-            Header("Timeline") { nl.giejay.android.tv.immich.assets.TimelineBucketPickerFragment() },            
+            // ANTES 2 Header("Timeline") { nl.giejay.android.tv.immich.assets.TimelineBucketPickerFragment() },            
+            Header("Timeline") { nl.giejay.android.tv.immich.assets.IntegratedTimelineFragment() },
             Header("Folders") { FolderFragment() },
             // ANTES Header("Timeline") { TimelineFragment() },
             Header("Edit") { GridFragment(hideProgressBar = true) },

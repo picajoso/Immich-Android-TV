@@ -11,23 +11,7 @@ import nl.giejay.android.tv.immich.api.util.ApiUtil
 import nl.giejay.android.tv.immich.card.Card
 import nl.giejay.android.tv.immich.home.HomeFragmentDirections
 import nl.giejay.android.tv.immich.shared.fragment.VerticalCardGridFragment
-import nl.giejay.android.tv.immich.shared.prefs.ALL_ASSETS_SORTING
-import nl.giejay.android.tv.immich.shared.prefs.ContentType
-import nl.giejay.android.tv.immich.shared.prefs.DEBUG_MODE
-import nl.giejay.android.tv.immich.shared.prefs.EnumByTitlePref
-import nl.giejay.android.tv.immich.shared.prefs.FILTER_CONTENT_TYPE
-import nl.giejay.android.tv.immich.shared.prefs.GRID_COLUMN_COUNT
-import nl.giejay.android.tv.immich.shared.prefs.MetaDataScreen
-import nl.giejay.android.tv.immich.shared.prefs.PhotosOrder
-import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
-import nl.giejay.android.tv.immich.shared.prefs.SCREENSAVER_ANIMATE_ASSET_SLIDE
-import nl.giejay.android.tv.immich.shared.prefs.SLIDER_ANIMATION_SPEED
-import nl.giejay.android.tv.immich.shared.prefs.SLIDER_GLIDE_TRANSFORMATION
-import nl.giejay.android.tv.immich.shared.prefs.SLIDER_INTERVAL
-import nl.giejay.android.tv.immich.shared.prefs.SLIDER_MAX_CUT_OFF_HEIGHT
-import nl.giejay.android.tv.immich.shared.prefs.SLIDER_MAX_CUT_OFF_WIDTH
-import nl.giejay.android.tv.immich.shared.prefs.SLIDER_MERGE_PORTRAIT_PHOTOS
-import nl.giejay.android.tv.immich.shared.prefs.SLIDER_ONLY_USE_THUMBNAILS
+import nl.giejay.android.tv.immich.shared.prefs.*
 import nl.giejay.android.tv.immich.shared.util.toCard
 import nl.giejay.android.tv.immich.shared.util.toSliderItems
 import nl.giejay.mediaslider.util.LoadMore
@@ -61,47 +45,127 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
             }
         }
 
-        // 4. FIX COMPLETO: ACTUALIZAR VISTA Y MEMORIA (CORREGIDO Y COMPILABLE)
+        // Listener para actualizaciones inmediatas (cuando el fragmento sobrevive)
         setFragmentResultListener("asset_favorite_changed") { _, bundle ->
             val assetId = bundle.getString("assetId")
             val isFavorite = bundle.getBoolean("isFavorite")
             
             if (assetId != null) {
-                // A) ACTUALIZAR LA MEMORIA
-                // Usamos una variable local para evitar errores de concurrencia de Kotlin (Smart cast error)
-                val localAssets = assets 
-                val assetIndex = localAssets.indexOfFirst { it.id == assetId }
+                Timber.d("GenericAsset: Evento recibido $assetId -> $isFavorite")
                 
-                if (assetIndex != -1) {
-                    val updatedAsset = localAssets[assetIndex].copy(isFavorite = isFavorite)
-                    
-                    // Ahora comprobamos la variable local, que es segura
-                    if (localAssets is MutableList) {
-                        localAssets[assetIndex] = updatedAsset
-                    }
-                }
-
-                // B) ACTUALIZAR LA VISTA
-                if (adapter != null && adapter.size() > 0) {
-                    val count = adapter.size()
-                    for (i in 0 until count) {
-                        val item = adapter.get(i)
-                        if (item is Card && item.id == assetId) {
-                            item.isFavorite = isFavorite
-                            (adapter as? ArrayObjectAdapter)?.replace(i, item)
-                            Timber.d("GRID: Favorito actualizado para $assetId")
-                            break 
-                        }
-                    }
-                }
+                // 1. Guardar en cache global (persiste entre destrucciones)
+                FavoriteCache.overrides[assetId] = isFavorite
+                
+                // 2. Actualizar vista inmediatamente si está disponible
+                updateCardInAdapter(assetId, isFavorite)
+                
+                // 3. Actualizar memoria (lista de assets)
+                updateAssetInMemory(assetId, isFavorite)
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (adapter != null && adapter.size() > 0) {
-            (adapter as? ArrayObjectAdapter)?.notifyArrayItemRangeChanged(0, adapter.size())
+        
+        // Aplicar cache global al volver (crucial cuando el fragmento se recrea)
+        Timber.d("GenericAsset: onResume - Aplicando cache global")
+        applyGlobalCacheToAdapter()
+    }
+    
+    /**
+     * Actualiza un Card en el adaptador visual
+     */
+    private fun updateCardInAdapter(assetId: String, isFavorite: Boolean) {
+        if (adapter == null || adapter.size() == 0) {
+            Timber.d("GenericAsset: Adaptador no disponible para actualizar")
+            return
+        }
+        
+        val count = adapter.size()
+        for (i in 0 until count) {
+            val item = adapter.get(i)
+            if (item is Card && item.id == assetId) {
+                item.isFavorite = isFavorite
+                (adapter as? ArrayObjectAdapter)?.notifyArrayItemRangeChanged(i, 1)
+                Timber.d("GenericAsset: Card actualizado en adaptador en posición $i")
+                return
+            }
+        }
+        
+        Timber.d("GenericAsset: Card $assetId no encontrado en adaptador")
+    }
+    
+    /**
+     * Actualiza un Asset en la memoria (lista assets)
+     */
+    private fun updateAssetInMemory(assetId: String, isFavorite: Boolean) {
+        val index = assets.indexOfFirst { it.id == assetId }
+        if (index != -1 && assets is MutableList) {
+            val updatedAsset = assets[index].copy(isFavorite = isFavorite)
+            (assets as MutableList)[index] = updatedAsset
+            Timber.d("GenericAsset: Asset actualizado en memoria en índice $index")
+        }
+    }
+
+    /**
+     * Aplica el cache global de favoritos al adaptador
+     * Se ejecuta en onResume para capturar cambios hechos en otras pantallas
+     */
+    private fun applyGlobalCacheToAdapter() {
+        if (FavoriteCache.overrides.isEmpty()) {
+            Timber.d("GenericAsset: Cache global vacío")
+            return
+        }
+        
+        if (adapter == null || adapter.size() == 0) {
+            Timber.d("GenericAsset: Adaptador no disponible")
+            return
+        }
+        
+        var updatedCount = 0
+        val count = adapter.size()
+        
+        for (i in 0 until count) {
+            val item = adapter.get(i) ?: continue
+            
+            if (item is Card) {
+                val cachedValue = FavoriteCache.overrides[item.id]
+                if (cachedValue != null && item.isFavorite != cachedValue) {
+                    item.isFavorite = cachedValue
+                    (adapter as? ArrayObjectAdapter)?.notifyArrayItemRangeChanged(i, 1)
+                    updatedCount++
+                }
+            }
+        }
+        
+        if (updatedCount > 0) {
+            Timber.d("GenericAsset: Aplicados $updatedCount cambios del cache global")
+        }
+        
+        // También actualizar memoria
+        applyGlobalCacheToMemory()
+    }
+    
+    /**
+     * Aplica el cache global a la lista de assets en memoria
+     */
+    private fun applyGlobalCacheToMemory() {
+        if (assets.isEmpty() || FavoriteCache.overrides.isEmpty()) return
+        
+        if (assets is MutableList) {
+            var updatedCount = 0
+            for (i in assets.indices) {
+                val asset = assets[i]
+                val cachedValue = FavoriteCache.overrides[asset.id]
+                if (cachedValue != null && asset.isFavorite != cachedValue) {
+                    (assets as MutableList)[i] = asset.copy(isFavorite = cachedValue)
+                    updatedCount++
+                }
+            }
+            if (updatedCount > 0) {
+                Timber.d("GenericAsset: Aplicados $updatedCount cambios a memoria")
+            }
         }
     }
 
@@ -136,12 +200,12 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
     }
 
     override fun onItemClicked(card: Card) {
-        val toSliderItems = assets.toSliderItems(keepOrder = true, mergePortrait = PreferenceManager.get(SLIDER_MERGE_PORTRAIT_PHOTOS))
+        val toSliderItems = assets.toSliderItems(keepOrder = true, mergePortrait = false)
         val loadMore: LoadMore = suspend {
             val moreAssets = loadMoreAssets()
             // also load the data in the overview
             setDataOnMain(moreAssets)
-            moreAssets.toSliderItems(true, PreferenceManager.get(SLIDER_MERGE_PORTRAIT_PHOTOS))
+            moreAssets.toSliderItems(true, false)
         }
 
         findNavController().navigate(

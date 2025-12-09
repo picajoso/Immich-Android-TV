@@ -267,7 +267,7 @@
     </fragment>
    <fragment
         android:id="@+id/timelineFragment"
-        android:name="nl.giejay.android.tv.immich.assets.TimelineFragment"
+        android:name="nl.giejay.android.tv.immich.assets.IntegratedTimelineFragment"
         android:label="Timeline">
         
         <argument

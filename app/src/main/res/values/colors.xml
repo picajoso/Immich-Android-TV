@@ -49,4 +49,9 @@
 
     <color name="progressbarColor">#ffffff</color>
 
+    <color name="selected_month_background">#55513A6E</color>  
+    <color name="selected_text_color">#FFFFFF</color>
+    <color name="unselected_text_color">#AAAAAA</color>
+    <color name="year_title_color">#777777</color>
+
 </resources>

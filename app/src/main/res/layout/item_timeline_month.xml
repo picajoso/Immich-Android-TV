@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingStart="32dp"
+    android:paddingEnd="16dp"
+    android:focusable="true"
+    android:clickable="true">
+
+    <TextView
+        android:id="@+id/month_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Abril"
+        android:textSize="18sp"
+        android:textColor="@color/unselected_text_color"
+        android:singleLine="true"/>
+
+    <TextView
+        android:id="@+id/month_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="123"
+        android:textSize="16sp"
+        android:textColor="@color/unselected_text_color"/>
+</LinearLayout>

@@ -1,3 +1,4 @@
+// CardPresenter.kt - AGREGAR ESTO AL PRINCIPIO DEL ARCHIVO O MODIFICAR LA LÍNEA 71
 package nl.giejay.android.tv.immich.card
 
 import android.app.Activity
@@ -7,8 +8,6 @@ import android.graphics.Outline
 import android.graphics.drawable.LayerDrawable
 import android.view.ContextThemeWrapper
 import android.view.Gravity
-import android.view.HapticFeedbackConstants
-import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
@@ -25,11 +24,12 @@ import timber.log.Timber
 open class CardPresenter(context: Context, style: Int = R.style.DefaultCardTheme) :
     AbstractPresenter<ImageCardView, ICard>(ContextThemeWrapper(context, style)) {
 
+    // Variables para definir qué hacer al pulsar
     var onLongClick: ((ICard) -> Unit)? = null
+    var onClick: ((ICard) -> Unit)? = null
 
     companion object {
         private const val VIDEO_ICON_TAG = "VIDEO_OVERLAY_ICON"
-        private const val LONG_PRESS_DURATION = 400L // 400ms para que sea ágil
     }
 
     override fun onCreateView(): ImageCardView {
@@ -58,53 +58,51 @@ open class CardPresenter(context: Context, style: Int = R.style.DefaultCardTheme
         cardView.mainImageView!!.clipToOutline = true
         cardView.setBackgroundColor(Color.TRANSPARENT)
 
+        cardView.isFocusable = true
+        cardView.isFocusableInTouchMode = true
+
         return cardView
     }
 
     override fun onBindViewHolder(card: ICard, cardView: ImageCardView) {
         cardView.tag = card
         
-        // Limpiamos listeners estándar
-        cardView.setOnClickListener(null)
-        cardView.setOnLongClickListener(null)
-
-        // --- LÓGICA DE TECLADO POR TIEMPO ---
-        cardView.setOnKeyListener(object : View.OnKeyListener {
-            var keyDownTime = 0L
-
-            override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
-                // Solo botón central/enter/A
-                if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_BUTTON_A) {
-                    
-                    if (event?.action == KeyEvent.ACTION_DOWN) {
-                        if (event.repeatCount == 0) {
-                            // Guardamos el momento exacto en que se pulsó
-                            keyDownTime = System.currentTimeMillis()
-                        }
-                        // Consumimos el evento (frena la ametralladora)
-                        return true
-                    } 
-                    else if (event?.action == KeyEvent.ACTION_UP) {
-                        val duration = System.currentTimeMillis() - keyDownTime
-                        
-                        if (duration >= LONG_PRESS_DURATION) {
-                            // FUE LARGO -> Favorito
-                            Timber.d("LONG PRESS (Duration: ${duration}ms)")
-                            onLongClick?.invoke(card)
-                            cardView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                        } else {
-                            // FUE CORTO -> Abrir foto
-                            Timber.d("SHORT CLICK (Duration: ${duration}ms)")
-                            v?.performClick()
-                        }
-                        // Consumimos el UP para que el sistema no haga nada más
-                        return true
+        // 1. Configurar CLIC NORMAL con manejo de errores
+        cardView.setOnClickListener {
+            Timber.d("CLICK EN CardPresenter para card: ${card.id}")
+            try {
+                onClick?.invoke(card)
+                Timber.d("onClick ejecutado correctamente")
+            } catch (e: Exception) {
+                Timber.e(e, "Error al ejecutar onClick para card: ${card.id}")
+                // Intenta mostrar un error al usuario
+                try {
+                    if (context is Activity) {
+                        android.widget.Toast.makeText(
+                            context, 
+                            "Error al abrir la foto", 
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
                     }
+                } catch (toastEx: Exception) {
+                    Timber.e(toastEx, "Error al mostrar toast")
                 }
-                return false
             }
-        })
-        // ------------------------------------
+        }
+
+        // 2. Configurar CLIC LARGO con manejo de errores
+        cardView.setOnLongClickListener {
+            Timber.d("LONG CLICK EN CardPresenter para card: ${card.id}")
+            try {
+                onLongClick?.invoke(card)
+            } catch (e: Exception) {
+                Timber.e(e, "Error al ejecutar onLongClick para card: ${card.id}")
+            }
+            true 
+        }
+        
+        // Limpiar listener de teclas conflictivo
+        cardView.setOnKeyListener(null)
 
         val spacing = cardView.resources.getDimensionPixelSize(R.dimen.card_spacing)
         if (cardView.layoutParams is ViewGroup.MarginLayoutParams) {
@@ -129,7 +127,7 @@ open class CardPresenter(context: Context, style: Int = R.style.DefaultCardTheme
         
         val layers = mutableListOf<android.graphics.drawable.Drawable>()
 
-        if (card is Card && card.isVideo) {
+        if (card is nl.giejay.android.tv.immich.card.Card && card.isVideo) {
             val playIcon = context.getDrawable(android.R.drawable.ic_media_play)?.mutate()
             playIcon?.setTint(Color.WHITE)
             if (playIcon != null) {
@@ -140,8 +138,8 @@ open class CardPresenter(context: Context, style: Int = R.style.DefaultCardTheme
             }
         }
 
-        if (card is Card && card.isFavorite) {
-            val starIcon = context.getDrawable(android.R.drawable.btn_star_big_on)?.mutate()
+        if (card is nl.giejay.android.tv.immich.card.Card && card.isFavorite) {
+            val starIcon = context.getDrawable(nl.giejay.android.tv.immich.R.drawable.ic_favorite_white_filled_24dp)?.mutate()
             if (starIcon != null) {
                 val layerStar = LayerDrawable(arrayOf(starIcon))
                 layerStar.setLayerGravity(0, Gravity.TOP or Gravity.END)
@@ -173,7 +171,8 @@ open class CardPresenter(context: Context, style: Int = R.style.DefaultCardTheme
             val imgView = (viewHolder.view as ImageCardView).mainImageView!!
             Glide.with(context).clear(imgView)
             imgView.foreground = null
-            viewHolder.view.setOnKeyListener(null)
+            viewHolder.view.setOnClickListener(null)
+            viewHolder.view.setOnLongClickListener(null)
         } catch (e: IllegalArgumentException){
             Timber.e(e)
         }

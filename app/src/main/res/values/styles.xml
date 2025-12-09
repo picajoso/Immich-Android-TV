@@ -20,6 +20,14 @@
         <item name="android:textColor">@color/screen_white</item>
     </style>
 
+    <style name="TimelineYearTitle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/year_title_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
     <style name="Body.Error">
         <item name="android:textColor">@color/error_text</item>
         <!-- Setting accessibilityLiveRegion to assertive means that accessibility services

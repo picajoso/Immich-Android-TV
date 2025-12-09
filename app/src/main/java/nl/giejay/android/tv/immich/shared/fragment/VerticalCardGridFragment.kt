@@ -374,6 +374,12 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
                     // 3. Éxito: Actualizamos la UI inmediatamente
                     withContext(Dispatchers.Main) {
                         card.isFavorite = newStatus
+
+                        // AÑADIDO: Guardar en cache global
+                        nl.giejay.android.tv.immich.assets.FavoriteCache.overrides[card.id] = newStatus
+                        Timber.d("VerticalCardGrid: Guardado en FavoriteCache: ${card.id} -> $newStatus")
+                    
+
                         // Avisamos al adaptador para que repinte la estrella
                         val index = adapter.indexOf(card)
                         if (index != -1) {
