@@ -106,13 +106,13 @@ object PreferenceManager {
         }
         // todo add toggles
 
-        if (get(SLIDER_SHOW_DATE)) {
-            metaData.add(MetaDataSliderItem(MetaDataType.DATE, AlignOption.RIGHT))
-        }
+        // Always add date
+        metaData.add(MetaDataSliderItem(MetaDataType.DATE, AlignOption.RIGHT))
 
-        if (get(SLIDER_SHOW_MEDIA_COUNT)) {
-            metaData.add(MetaDataMediaCount(AlignOption.RIGHT))
-        }
+        // Never add media count
+        // if (get(SLIDER_SHOW_MEDIA_COUNT)) {
+        //     metaData.add(MetaDataMediaCount(AlignOption.RIGHT))
+        // }
         return metaData
     }
 
@@ -151,7 +151,18 @@ object PreferenceManager {
     }
 
     fun getAllMetaData(metaDataScreen: MetaDataScreen): List<MetaDataItem> {
-        return getMetaData(AlignOption.RIGHT, metaDataScreen) + getMetaData(AlignOption.LEFT, metaDataScreen)
+        val allMetaData = (getMetaData(AlignOption.RIGHT, metaDataScreen) + getMetaData(AlignOption.LEFT, metaDataScreen)).toMutableList()
+
+        if (metaDataScreen == MetaDataScreen.VIEWER) {
+            // Remove any existing media count metadata for the viewer screen
+            allMetaData.removeAll { it is MetaDataMediaCount }
+
+            // Ensure MetaDataType.DATE is present for the viewer screen
+            if (allMetaData.none { it is MetaDataSliderItem && it.metaDataType == MetaDataType.DATE }) {
+                allMetaData.add(MetaDataSliderItem(MetaDataType.DATE, AlignOption.RIGHT))
+            }
+        }
+        return allMetaData.toList()
     }
 
     fun hasMetaDataForScreen(metaDataScreen: MetaDataScreen, align: AlignOption): Boolean {

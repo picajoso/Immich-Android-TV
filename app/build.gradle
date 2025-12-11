@@ -30,19 +30,16 @@ android {
         applicationId "nl.giejay.android.tv.immich"
         minSdkVersion 24
         targetSdkVersion 35
-        versionCode 318
-        versionName "3.18"
+        versionCode 319
+        versionName "3.19"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testOptions.unitTests.includeAndroidResources = true
     }
 
     signingConfigs {
-        release {
-            storeFile file(System.getenv("RELEASE_KEYSTORE_PATH") ?: "keystore")
-            storePassword System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "dummy"
-            keyAlias System.getenv("RELEASE_KEY_ALIAS") ?: "immich"
-            keyPassword System.getenv("RELEASE_KEY_PASSWORD") ?: "dummy"
+        debug {
+            // Use default debug keystore provided by Android Gradle Plugin
         }
     }
 
@@ -50,7 +47,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
         }
     }
 

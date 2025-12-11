@@ -28,6 +28,8 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 import nl.giejay.android.tv.immich.api.model.BucketResponse
 import nl.giejay.android.tv.immich.api.model.UpdateAssetRequest
+import timber.log.Timber
+import java.util.Calendar
 
 data class ApiClientConfig(
     val hostName: String,
@@ -122,6 +124,56 @@ class ApiClient(private val config: ApiClientConfig) {
             return map.first()
         }
         return Either.Right(map.flatMap { it.getOrElse { emptyList() } }.shuffled())
+    }
+
+    suspend fun onThisDayAssets(page: Int, pageCount: Int, contentType: ContentType): Either<String, List<Asset>> {
+        val now = LocalDateTime.now()
+        val today = now.dayOfMonth
+        val currentMonth = now.monthValue
+    
+        Timber.d("OnThisDay: Buscando fotos del día $today del mes $currentMonth")
+    
+        val map: List<Either<String, List<Asset>>> = (0 until PreferenceManager.get(SIMILAR_ASSETS_YEARS_BACK)).toList().map { yearOffset ->
+            val fromDate = now.withHour(0).withMinute(0).withSecond(0).minusYears(yearOffset.toLong())
+            val endDate = now.withHour(23).withMinute(59).withSecond(59).minusYears(yearOffset.toLong())
+        
+            Timber.d("OnThisDay: Año ${now.year - yearOffset} - Buscando desde $fromDate hasta $endDate")
+        
+            listAssets(page,
+                pageCount,
+                true,
+                "desc",
+                fromDate = fromDate,
+                endDate = endDate,
+                contentType = contentType)
+        }
+    
+        if (map.all { it.isLeft() }) {
+            return map.first()
+        }
+    
+        val allAssets = map.flatMap { it.getOrElse { emptyList() } }
+        Timber.d("OnThisDay: Total assets antes de filtrar: ${allAssets.size}")
+    
+        // Filtrar para asegurar que solo tenemos fotos del día y mes actual
+        val filteredAssets = allAssets.filter { asset ->
+            asset.exifInfo?.dateTimeOriginal?.let { date ->
+                val cal = Calendar.getInstance()
+                cal.time = date
+                val assetDay = cal.get(Calendar.DAY_OF_MONTH)
+                val assetMonth = cal.get(Calendar.MONTH) + 1 // Calendar.MONTH es 0-indexed
+            
+                val matches = assetDay == today && assetMonth == currentMonth
+                if (!matches) {
+                    Timber.d("OnThisDay: Descartando asset del día $assetDay/$assetMonth")
+                }
+                matches
+            } ?: false
+        }
+    
+        Timber.d("OnThisDay: Total assets después de filtrar: ${filteredAssets.size}")
+    
+        return Either.Right(filteredAssets)
     }
 
     suspend fun listAssets(page: Int,

@@ -90,22 +90,8 @@ fun Asset.toSliderItem(): SliderItem {
 }
 
 private fun formatDate(date: Date): String {
-    val calendar = Calendar.getInstance()
-    calendar.time = date
     val locale = Locale.getDefault(Locale.Category.FORMAT)
-    val isEnglish = locale.language == "en"
-    val day = calendar[Calendar.DATE]
-    val formatString = if (isEnglish) {
-        when (day) {
-            1, 21, 31 -> "EEEE, d'st' MMMM yyyy"
-            2, 22 -> "EEEE, d'nd' MMMM yyyy"
-            3, 23 -> "EEEE, d'rd' MMMM yyyy"
-            else -> "EEEE, d'th' MMMM yyyy"
-        }
-    } else {
-        "EEEE, d. MMMM yyyy"
-    }
-    return SimpleDateFormat(formatString, locale).format(date)
+    return SimpleDateFormat("dd/MM/yyyy", locale).format(date)
 }
 
 fun Asset.isPortraitImage(): Boolean {

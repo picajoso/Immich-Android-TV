@@ -23,6 +23,7 @@ import nl.giejay.android.tv.immich.assets.RandomAssetsFragment
 import nl.giejay.android.tv.immich.assets.RecentAssetsFragment
 import nl.giejay.android.tv.immich.assets.SimilarTimeAssetsFragment
 import nl.giejay.android.tv.immich.assets.TimelineFragment
+import nl.giejay.android.tv.immich.onthisday.OnThisDayBrowseFragment
 import nl.giejay.android.tv.immich.people.PeopleFragment
 import nl.giejay.android.tv.immich.settings.SettingsFragment
 import nl.giejay.android.tv.immich.shared.fragment.GridFragment
@@ -71,7 +72,6 @@ class HomeFragment : BrowseSupportFragment() {
             } else{
                 if (!this.isInHeadersTransition) {
                     this.startHeadersTransition(false)
-//                    this.mainFragment.requireView().requestFocus()
                 }
             }
         }
@@ -82,13 +82,7 @@ class HomeFragment : BrowseSupportFragment() {
         isHeadersTransitionOnBackEnabled = true
         brandColor = resources.getColor(android.R.color.black)
         title = "Albums"
-//        setOnSearchClickedListener {
-//            Toast.makeText(
-//                activity, "Search!", Toast.LENGTH_SHORT
-//            ).show()
-//        }
 
-        // Lines of code to be added
         val sHeaderPresenter: PresenterSelector = ClassPresenterSelector()
             .addClassPresenter(DividerRow::class.java, DividerPresenter())
             .addClassPresenter(
@@ -130,11 +124,10 @@ class HomeFragment : BrowseSupportFragment() {
             Header("Random") { RandomAssetsFragment() },
             Header("People") { PeopleFragment() },
             Header("Recent") { RecentAssetsFragment() },
+            Header("On this day") { OnThisDayBrowseFragment() }, // CAMBIADO AQUÍ
             Header("Seasonal") { SimilarTimeAssetsFragment() },
-            // ANTES 2 Header("Timeline") { nl.giejay.android.tv.immich.assets.TimelineBucketPickerFragment() },            
             Header("Timeline") { nl.giejay.android.tv.immich.assets.IntegratedTimelineFragment() },
             Header("Folders") { FolderFragment() },
-            // ANTES Header("Timeline") { TimelineFragment() },
             Header("Edit") { GridFragment(hideProgressBar = true) },
             Header("Settings") { SettingsFragment() },
         )

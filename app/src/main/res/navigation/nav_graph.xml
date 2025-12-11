@@ -220,6 +220,9 @@
             app:destination="@id/timelineFragment"
             app:popUpTo="@id/timelineFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_onThisDayBrowseFragment"
+            app:destination="@id/onThisDayBrowseFragment" />
     </fragment>
 
     <dialog
@@ -295,5 +298,11 @@
             app:destination="@id/timelineFragment"
             app:popUpTo="@id/timelineFragment"
             app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/onThisDayBrowseFragment"
+        android:name="nl.giejay.android.tv.immich.onthisday.OnThisDayBrowseFragment"
+        android:label="OnThisDayBrowseFragment">
     </fragment>
 </navigation>
