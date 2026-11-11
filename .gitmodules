@@ -1,3 +1,4 @@
 [submodule "mediaslider"]
 	path = mediaslider
-	url = https://github.com/giejay/MediaSliderView
+	url = https://github.com/picajoso/MediaSliderView
+	branch = immich-tv
