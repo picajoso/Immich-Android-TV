@@ -41,13 +41,28 @@ android {
         debug {
             // Use default debug keystore provided by Android Gradle Plugin
         }
+        // The app's own release key, kept out of the repo: release.storeFile, release.storePassword,
+        // release.keyAlias and release.keyPassword in local.properties. Builds on any computer that has them sign
+        // the same way, so an update installs over the app already on the TV.
+        release {
+            def props = new Properties()
+            def file = rootProject.file('local.properties')
+            if (file.exists()) file.withInputStream { props.load(it) }
+            if (props.getProperty('release.storeFile')) {
+                storeFile rootProject.file(props.getProperty('release.storeFile'))
+                storePassword props.getProperty('release.storePassword')
+                keyAlias props.getProperty('release.keyAlias')
+                keyPassword props.getProperty('release.keyPassword')
+            }
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            // The release key when local.properties names one, otherwise the debug key as before.
+            signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
         }
     }
 
