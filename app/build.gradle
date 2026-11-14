@@ -58,6 +58,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Installs next to the release build instead of clashing with its signature.
+            applicationIdSuffix ".debug"
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
