@@ -314,6 +314,20 @@ data object EXCLUDE_ASSETS_IN_ALBUM : StringSetPref(emptySet(), "Excluded albums
 }
 
 // Building the view
+data object UI_STYLE : EnumByTitlePref<UiStyle>(UiStyle.APPLE,
+    "Interface style",
+    "Look of the app: Apple or Google TV") {
+    override fun key() = "ui_style"
+
+    override fun fromPrefValue(prefValue: String): UiStyle {
+        return UiStyle.valueOfSafe(prefValue, defaultValue)
+    }
+
+    override fun getEnumEntries(): Array<UiStyle> {
+        return UiStyle.entries.toTypedArray()
+    }
+}
+
 data object SHOW_ONLY_VIDEOS : BooleanPref(false, "Show only videos", "When enabled, all sections will only show videos")
 
 
@@ -326,6 +340,7 @@ data object VIEW_SETTINGS_CUSTOMIZER : ActionPref("Customize view", "Configure w
 
 data object ViewPrefScreen : PrefScreen("View Settings", "view",
     listOf(
+        PrefCategory("Appearance", listOf(UI_STYLE)),
         PrefCategory("Ordering",
             listOf(
                 ALBUMS_SORTING,

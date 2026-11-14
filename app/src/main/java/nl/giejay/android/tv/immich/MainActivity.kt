@@ -16,6 +16,7 @@
 package nl.giejay.android.tv.immich
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
@@ -26,6 +27,9 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import nl.giejay.android.tv.immich.shared.prefs.MetaDataScreen
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
+import nl.giejay.android.tv.immich.shared.prefs.UI_STYLE
+import nl.giejay.android.tv.immich.ui.UiFonts
+import nl.giejay.android.tv.immich.ui.UiStyleProvider
 import nl.giejay.android.tv.immich.shared.viewmodel.KeyEventsViewModel
 import nl.giejay.mediaslider.adapter.AlignOption
 import timber.log.Timber
@@ -39,6 +43,15 @@ class MainActivity : FragmentActivity() {
     private lateinit var navGraph: NavGraph
     private lateinit var navController: NavController
 
+    // strong reference needed: SharedPreferences only keeps listeners weakly
+    private val uiStyleListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == UI_STYLE.key()) {
+            Timber.i("Interface style changed, recreating activity")
+            UiFonts.preload(this, UiStyleProvider.currentStyle())
+            recreate()
+        }
+    }
+
     // KEYCODE_PROG_RED (keycode 183) for delete photo
     private val DELETE_BUTTON_KEYCODE = 183
 
@@ -50,6 +63,7 @@ class MainActivity : FragmentActivity() {
         setContentView(R.layout.activity_main)
 
         keyEventsModel = ViewModelProvider(this)[KeyEventsViewModel::class.java]
+        PreferenceManager.sharedPreference.registerOnSharedPreferenceChangeListener(uiStyleListener)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -111,6 +125,7 @@ class MainActivity : FragmentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        PreferenceManager.sharedPreference.unregisterOnSharedPreferenceChangeListener(uiStyleListener)
         Timber.i("Main activity got destroyed")
     }
 }

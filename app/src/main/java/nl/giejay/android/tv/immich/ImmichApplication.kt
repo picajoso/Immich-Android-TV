@@ -26,6 +26,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import nl.giejay.android.tv.immich.shared.prefs.DEBUG_MODE
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.shared.prefs.USER_ID
+import nl.giejay.android.tv.immich.ui.UiFonts
+import nl.giejay.android.tv.immich.ui.UiStyleProvider
 import timber.log.Timber
 import java.util.UUID
 
@@ -46,6 +48,8 @@ class ImmichApplication : Application() {
         } else {
             Timber.plant(CrashReportingTree())
         }
+
+        UiFonts.preload(this, UiStyleProvider.currentStyle())
 
         var userId = PreferenceManager.get(USER_ID)
         if(userId.isBlank()){
