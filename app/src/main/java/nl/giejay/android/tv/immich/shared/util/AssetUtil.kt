@@ -1,6 +1,7 @@
 package nl.giejay.android.tv.immich.shared.util
 
 import nl.giejay.mediaslider.model.SliderItem
+import nl.giejay.mediaslider.model.SliderItemDetails
 import nl.giejay.mediaslider.model.SliderItemType
 import nl.giejay.mediaslider.model.SliderItemViewHolder
 import nl.giejay.android.tv.immich.api.util.ApiUtil
@@ -85,7 +86,34 @@ fun Asset.toSliderItem(): SliderItem {
             MetaDataType.FILEPATH to this.originalPath,
             MetaDataType.CAMERA to (listOf(this.exifInfo?.make, this.exifInfo?.model)).filterNotNull().joinToString(" ")),
         ApiUtil.getThumbnailUrl(this.id, "preview"),
-        this.isFavorite // <--- PASAMOS EL VALOR
+        this.isFavorite, // <--- PASAMOS EL VALOR
+        this.toSliderDetails()
+    )
+}
+
+private fun Asset.toSliderDetails(): SliderItemDetails {
+    val exif = this.exifInfo
+    val make = exif?.make?.trim()?.takeIf { it.isNotEmpty() }
+    val model = exif?.model?.trim()?.takeIf { it.isNotEmpty() }
+    // many models already contain the make ("Google Pixel 9" vs make "Google")
+    val camera = when {
+        model != null && make != null && !model.startsWith(make, ignoreCase = true) -> "$make $model"
+        model != null -> model
+        else -> make
+    }
+    return SliderItemDetails(
+        dateMillis = (exif?.dateTimeOriginal ?: this.fileModifiedAt)?.time,
+        city = exif?.city,
+        country = exif?.country,
+        cameraName = camera,
+        lensModel = exif?.lensModel,
+        focalLengthMm = exif?.focalLength,
+        fNumber = exif?.fNumber,
+        exposureTime = exif?.exposureTime,
+        iso = exif?.iso,
+        width = exif?.exifImageWidth,
+        height = exif?.exifImageHeight,
+        fileSizeBytes = exif?.fileSizeInByte
     )
 }
 

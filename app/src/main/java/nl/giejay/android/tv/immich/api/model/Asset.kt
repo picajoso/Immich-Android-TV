@@ -11,7 +11,14 @@ data class AssetExifInfo(
     val country: String?,
     val dateTimeOriginal: Date?,
     val make: String?,
-    val model: String?
+    val model: String?,
+    // exposure / file details for the viewer info panel (all optional, absent on partial exif)
+    val lensModel: String? = null,
+    val fNumber: Double? = null,
+    val focalLength: Double? = null,
+    val iso: Int? = null,
+    val exposureTime: String? = null,
+    val fileSizeInByte: Long? = null
 )
 
 data class Tag(

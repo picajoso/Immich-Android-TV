@@ -27,6 +27,7 @@ import nl.giejay.android.tv.immich.shared.viewmodel.KeyEventsViewModel
 import nl.giejay.mediaslider.config.MediaSliderConfiguration
 import nl.giejay.mediaslider.view.MediaSliderFragment
 import nl.giejay.mediaslider.view.MediaSliderView
+import nl.giejay.android.tv.immich.ui.UiStyleProvider
 import nl.giejay.android.tv.immich.shared.cache.FavoriteCache
 import timber.log.Timber
 
@@ -82,6 +83,12 @@ class ImmichMediaSlider : MediaSliderFragment() {
             DefaultHttpDataSource.Factory()
                 .setDefaultRequestProperties(mapOf("x-api-key" to PreferenceManager.get(API_KEY)))
         )
+
+        // photo only + info pill / info panel, styled by the active interface style
+        if (view is MediaSliderView) {
+            view.enableViewerOverlay(UiStyleProvider.viewerStyle())
+            view.onToggleFavoriteRequested = { toggleFavoriteCurrentItem(view) }
+        }
 
         loadMediaSliderView(config)
 

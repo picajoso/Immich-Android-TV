@@ -10,6 +10,7 @@ import android.widget.TextView
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.shared.prefs.UI_STYLE
 import nl.giejay.android.tv.immich.shared.prefs.UiStyle
+import nl.giejay.mediaslider.view.ViewerStyle
 
 /**
  * Design tokens of one interface style (dark only). Values are dp / sp, colors are ARGB ints.
@@ -177,5 +178,42 @@ object UiStyleProvider {
         view.typeface = bodyTypeface(t)
         view.textSize = sizeSp
         view.setTextColor(color)
+    }
+
+    /** Look of the viewer pill and info panel (mediaslider module) for the active style. */
+    fun viewerStyle(t: UiTokens = current()): ViewerStyle = when (t.style) {
+        UiStyle.APPLE -> ViewerStyle(
+            titleTypeface = titleTypeface(t),
+            bodyTypeface = bodyTypeface(t)
+        )
+        UiStyle.GOOGLE_TV -> ViewerStyle(
+            pillBg = 0xEB1F2024.toInt(),
+            pillStroke = 0,
+            pillText = 0xFFFFFFFF.toInt(),
+            pillTextDim = t.dim,
+            pillSeparator = t.dim,
+            panelBg = 0xFF1F2024.toInt(),
+            panelStroke = 0,
+            panelWidthDp = 270,
+            panelMarginDp = 0,
+            panelCornerDp = 0f,
+            panelPaddingHDp = 18,
+            panelPaddingVDp = 26,
+            panelHeading = true,
+            text = t.text,
+            dim = t.dim,
+            iconTint = t.dim,
+            cardBlocks = true,
+            blockBg = t.pillBg,
+            blockCornerDp = 9f,
+            primaryBg = t.text,
+            primaryText = t.bg,
+            secondaryBg = t.pillBg,
+            secondaryText = t.text,
+            focusRing = t.focusRing,
+            buttonCornerDp = 36f,
+            titleTypeface = titleTypeface(t),
+            bodyTypeface = bodyTypeface(t)
+        )
     }
 }
