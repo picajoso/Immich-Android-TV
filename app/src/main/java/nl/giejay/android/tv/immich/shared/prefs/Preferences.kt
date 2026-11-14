@@ -105,7 +105,7 @@ data object SCREENSAVER_ALBUMS : StringSetPref(mutableSetOf(), "Set albums to sh
     }
 }
 
-data object SCREENSAVER_METADATA_CUSTOMIZER : ActionPref("Customize metadata", "Configure what to show in screensaver", { _, navController ->
+data object SCREENSAVER_METADATA_CUSTOMIZER : ActionPref("Customize screensaver metadata", "Configure what to show in screensaver", { _, navController ->
     navController.navigate(
         MetaDataCustomizerFragmentDirections.actionToMetadataFragment(MetaDataScreen.SCREENSAVER)
     )
@@ -345,13 +345,11 @@ data object ViewPrefScreen : PrefScreen("View Settings", "view",
             listOf(
                 ALBUMS_SORTING,
                 PHOTOS_SORTING,
-                GRID_COLUMN_COUNT,
                 ALL_ASSETS_SORTING)
         ),
         PrefCategory("Slideshow", listOf(
             SLIDER_ONLY_USE_THUMBNAILS,
             SLIDER_MERGE_PORTRAIT_PHOTOS,
-            SLIDER_METADATA_CUSTOMIZER,
             SLIDER_INTERVAL,
             SLIDER_ANIMATION_SPEED,
             SLIDER_GLIDE_TRANSFORMATION,

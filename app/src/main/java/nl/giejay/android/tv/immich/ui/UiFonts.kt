@@ -11,7 +11,7 @@ import timber.log.Timber
 
 /**
  * Downloadable fonts (Inter for Apple, Outfit for Google TV) through the Google Fonts provider
- * (res/font/*.xml). Downloads are asynchronous and best effort: until a font arrives (or when the
+ * (the font family XML files in res/font). Downloads are asynchronous and best effort: until a font arrives (or when the
  * provider is not available on the device) a system sans-serif typeface is used.
  * Call [preload] early (Application.onCreate); views created later pick up the cached typeface.
  */

@@ -251,7 +251,8 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
             ?: assets.firstOrNull { it.id == card.id }
         updateDatePill(
             asset?.let { it.exifInfo?.dateTimeOriginal ?: it.fileModifiedAt },
-            asset?.exifInfo?.city
+            asset?.exifInfo?.city,
+            asset?.exifInfo?.timeZone
         )
     }
 
@@ -260,7 +261,7 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
         // first batch: show the date of the first photo until the user moves the focus
         if (usePhotoTiles && isDatePillEmpty()) {
             this.assets.firstOrNull()?.let { first ->
-                updateDatePill(first.exifInfo?.dateTimeOriginal ?: first.fileModifiedAt, first.exifInfo?.city)
+                updateDatePill(first.exifInfo?.dateTimeOriginal ?: first.fileModifiedAt, first.exifInfo?.city, first.exifInfo?.timeZone)
             }
         }
     }

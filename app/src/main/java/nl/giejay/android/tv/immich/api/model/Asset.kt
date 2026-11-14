@@ -18,7 +18,8 @@ data class AssetExifInfo(
     val focalLength: Double? = null,
     val iso: Int? = null,
     val exposureTime: String? = null,
-    val fileSizeInByte: Long? = null
+    val fileSizeInByte: Long? = null,
+    val timeZone: String? = null
 )
 
 data class Tag(

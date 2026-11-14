@@ -384,7 +384,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
      * Shows "Wed, Nov 12, 2026 · City" in the header pill. Text only: no layout work besides the
      * pill itself. The city part is omitted when unknown.
      */
-    protected fun updateDatePill(date: Date?, city: String?) {
+    protected fun updateDatePill(date: Date?, city: String?, timeZoneId: String? = null) {
         val pill = datePill ?: return
         if (date == null) {
             pill.text = ""
@@ -394,7 +394,12 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         val tokens = UiStyleProvider.current()
         val locale = Locale.getDefault(Locale.Category.FORMAT)
         val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "EEEMMMdyyyy")
-        val dateText = java.text.SimpleDateFormat(pattern, locale).format(date)
+        val format = java.text.SimpleDateFormat(pattern, locale)
+        timeZoneId?.takeIf { it.isNotBlank() }?.let { id ->
+            // unknown ids make TimeZone.getTimeZone return GMT, so only accept known ones
+            if (java.util.TimeZone.getAvailableIDs().contains(id)) format.timeZone = java.util.TimeZone.getTimeZone(id)
+        }
+        val dateText = format.format(date)
         val text = SpannableStringBuilder(dateText)
         text.setSpan(ForegroundColorSpan(tokens.text), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

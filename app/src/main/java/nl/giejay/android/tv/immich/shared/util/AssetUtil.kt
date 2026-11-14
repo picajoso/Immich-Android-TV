@@ -113,7 +113,8 @@ private fun Asset.toSliderDetails(): SliderItemDetails {
         iso = exif?.iso,
         width = exif?.exifImageWidth,
         height = exif?.exifImageHeight,
-        fileSizeBytes = exif?.fileSizeInByte
+        fileSizeBytes = exif?.fileSizeInByte,
+        timeZoneId = exif?.timeZone
     )
 }
 
