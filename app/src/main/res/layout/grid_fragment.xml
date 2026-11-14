@@ -35,6 +35,35 @@
                         android:singleLine="true"
                         android:focusable="false" />
 
+                <!-- optional header actions (month view: previous / next month) -->
+                <LinearLayout
+                        android:id="@+id/grid_header_actions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginEnd="12dp"
+                        android:visibility="gone">
+
+                    <TextView
+                            android:id="@+id/grid_action_prev"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:singleLine="true"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:visibility="gone" />
+
+                    <TextView
+                            android:id="@+id/grid_action_next"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:visibility="gone" />
+                </LinearLayout>
+
                 <TextView
                         android:id="@+id/grid_date_pill"
                         android:layout_width="wrap_content"

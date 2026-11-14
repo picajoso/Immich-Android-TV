@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
@@ -18,7 +17,8 @@ import androidx.leanback.widget.PageRow
 import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.SectionRow
-import nl.giejay.android.tv.immich.album.AlbumFragment
+import nl.giejay.android.tv.immich.album.AlbumsHeroFragment
+import nl.giejay.android.tv.immich.assets.TimelineOverviewFragment
 import nl.giejay.android.tv.immich.assets.AllAssetFragment
 import nl.giejay.android.tv.immich.assets.FolderFragment
 import nl.giejay.android.tv.immich.assets.RandomAssetsFragment
@@ -184,11 +184,7 @@ class HomeFragment : BrowseSupportFragment() {
         )
 
         private val HEADERS: List<Header> = listOf(
-            Header("Albums") {
-                AlbumFragment().apply {
-                    arguments = bundleOf("selectionMode" to false)
-                }
-            },
+            Header("Albums") { AlbumsHeroFragment() },
             Header("Photos") { AllAssetFragment() },
             Header("Random") { RandomAssetsFragment() },
             Header("People") { PeopleFragment() },
@@ -196,7 +192,7 @@ class HomeFragment : BrowseSupportFragment() {
             Header("Favorites") { FavoritesBrowseFragment() },
             Header("On this day") { OnThisDayBrowseFragment() }, // CAMBIADO AQUÍ
             Header("Seasonal") { SimilarTimeAssetsFragment() },
-            Header("Timeline") { nl.giejay.android.tv.immich.assets.IntegratedTimelineFragment() },
+            Header("Timeline") { TimelineOverviewFragment() },
             Header("Folders") { FolderFragment() },
             Header("Edit") { GridFragment(hideProgressBar = true) },
             Header("Settings") { SettingsFragment() },

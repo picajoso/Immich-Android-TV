@@ -261,6 +261,14 @@ class ApiClient(private val config: ApiClientConfig) {
         }
     }
 
+    /** First (oldest) asset of a calendar month, used as cover in the timeline overview. */
+    suspend fun firstAssetOfMonth(year: Int, month: Int): Either<String, Asset?> {
+        val from = LocalDateTime.of(year, month, 1, 0, 0, 0)
+        val end = from.plusMonths(1).minusSeconds(1)
+        return listAssets(1, 1, false, "asc", fromDate = from, endDate = end, contentType = ContentType.ALL)
+            .map { it.firstOrNull() }
+    }
+
     suspend fun listFolders(): Either<String, Folder> {
         return executeAPICall(200) {
             service.getUniquePaths()
