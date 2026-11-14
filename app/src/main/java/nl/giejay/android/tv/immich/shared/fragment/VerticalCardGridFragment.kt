@@ -372,6 +372,18 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         datePill = pill
     }
 
+    /** Shows a small pill-shaped action button in the header of a photo grid (e.g. "Shuffle"). */
+    protected fun setHeaderAction(text: String, onClick: () -> Unit) {
+        val root = view ?: return
+        val actions = root.findViewById<View>(R.id.grid_header_actions) ?: return
+        val button = root.findViewById<TextView>(R.id.grid_action_next) ?: return
+        nl.giejay.android.tv.immich.ui.PageKit.stylePill(button, UiStyleProvider.current(), selected = false)
+        button.text = text
+        button.visibility = View.VISIBLE
+        actions.visibility = View.VISIBLE
+        button.setOnClickListener { onClick() }
+    }
+
     /** True while the date pill has no text yet. */
     protected fun isDatePillEmpty(): Boolean = datePill?.text.isNullOrEmpty()
 

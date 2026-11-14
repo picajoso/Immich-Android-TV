@@ -91,7 +91,7 @@ class ImmichRowPresenter : Presenter() {
     }
 
     companion object {
-        private val ICONS: Map<String, Int> = mapOf(
+        val ICONS: Map<String, Int> = mapOf(
             "Photos" to R.drawable.ic_nav_photos,
             "Albums" to R.drawable.ic_nav_albums,
             "People" to R.drawable.ic_nav_people,

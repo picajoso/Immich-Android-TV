@@ -23,7 +23,7 @@ import nl.giejay.android.tv.immich.assets.AllAssetFragment
 import nl.giejay.android.tv.immich.assets.FolderFragment
 import nl.giejay.android.tv.immich.assets.RandomAssetsFragment
 import nl.giejay.android.tv.immich.assets.RecentAssetsFragment
-import nl.giejay.android.tv.immich.assets.SimilarTimeAssetsFragment
+import nl.giejay.android.tv.immich.assets.SeasonalFragment
 import nl.giejay.android.tv.immich.assets.TimelineFragment
 import nl.giejay.android.tv.immich.onthisday.OnThisDayBrowseFragment
 import nl.giejay.android.tv.immich.favorite.FavoritesBrowseFragment
@@ -71,20 +71,25 @@ class HomeFragment : BrowseSupportFragment() {
             setSelectedPosition(firstPage, false)
         }
 
-        headersSupportFragment.setOnHeaderClickedListener { _, row ->
-            if (row.headerItem.name == "Edit") {
-                immichRowPresenter.editMode = !immichRowPresenter.editMode
-                rebuildRows()
-                adapter.notifyItemRangeChanged(0, mRowsAdapter.size());
-            } else if(immichRowPresenter.editMode){
-                PreferenceManager.toggleStringSetItem(row.headerItem.name, HIDDEN_HOME_ITEMS)
-                adapter.notifyItemRangeChanged(0, mRowsAdapter.size())
-            } else{
-                if (!this.isInHeadersTransition) {
-                    this.startHeadersTransition(false)
-                }
+        headersSupportFragment.setOnHeaderClickedListener { _, _ ->
+            if (!this.isInHeadersTransition) {
+                this.startHeadersTransition(false)
             }
         }
+    }
+
+    /** Switches the content to another page of the menu (e.g. Timeline / Folders toggle). */
+    fun selectPage(name: String) {
+        val row = pageRows[name] ?: return
+        val position = mRowsAdapter.indexOf(row)
+        if (position >= 0) setSelectedPosition(position, true)
+    }
+
+    /** Rebuilds the menu after the Edit page changed which sections are visible. */
+    private fun refreshMenu() {
+        rebuildRows()
+        val editPosition = (0 until mRowsAdapter.size()).firstOrNull { (mRowsAdapter.get(it) as? Row)?.headerItem?.name == "Edit" }
+        if (editPosition != null) setSelectedPosition(editPosition, false)
     }
 
     private fun setupUi() {
@@ -159,7 +164,13 @@ class HomeFragment : BrowseSupportFragment() {
         edgeHint = hint
         setBrowseTransitionListener(object : BrowseTransitionListener() {
             override fun onHeadersTransitionStart(withHeaders: Boolean) {
-                if (withHeaders) hint.visibility = View.GONE
+                if (withHeaders) {
+                    hint.visibility = View.GONE
+                    if (MenuState.dirty) {
+                        MenuState.dirty = false
+                        refreshMenu()
+                    }
+                }
             }
 
             override fun onHeadersTransitionStop(withHeaders: Boolean) {
@@ -183,6 +194,9 @@ class HomeFragment : BrowseSupportFragment() {
             "Collections" to listOf("On this day", "Seasonal", "Timeline", "Folders", "Edit")
         )
 
+        /** Every section of the menu in display order, Edit included, Settings excluded. */
+        val MENU_ENTRIES: List<String> get() = GROUPS.flatMap { it.second }
+
         private val HEADERS: List<Header> = listOf(
             Header("Albums") { AlbumsHeroFragment() },
             Header("Photos") { AllAssetFragment() },
@@ -191,10 +205,10 @@ class HomeFragment : BrowseSupportFragment() {
             Header("Recent") { RecentAssetsFragment() },
             Header("Favorites") { FavoritesBrowseFragment() },
             Header("On this day") { OnThisDayBrowseFragment() }, // CAMBIADO AQUÍ
-            Header("Seasonal") { SimilarTimeAssetsFragment() },
+            Header("Seasonal") { SeasonalFragment() },
             Header("Timeline") { TimelineOverviewFragment() },
             Header("Folders") { FolderFragment() },
-            Header("Edit") { GridFragment(hideProgressBar = true) },
+            Header("Edit") { EditMenuFragment() },
             Header("Settings") { SettingsFragment() },
         )
     }
