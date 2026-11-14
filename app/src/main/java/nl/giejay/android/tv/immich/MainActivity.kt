@@ -17,6 +17,7 @@ package nl.giejay.android.tv.immich
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
@@ -61,6 +62,7 @@ class MainActivity : FragmentActivity() {
         Timber.i("Booting main activity")
 
         setContentView(R.layout.activity_main)
+        window.setBackgroundDrawable(ColorDrawable(UiStyleProvider.current().bg))
 
         keyEventsModel = ViewModelProvider(this)[KeyEventsViewModel::class.java]
         PreferenceManager.sharedPreference.registerOnSharedPreferenceChangeListener(uiStyleListener)

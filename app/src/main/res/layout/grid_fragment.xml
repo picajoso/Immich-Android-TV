@@ -12,21 +12,53 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-        <FrameLayout
-                android:id="@+id/browse_grid_dock"
+        <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            <ProgressBar
-                android:id="@+id/browse_progressbar"
-                android:visibility="visible"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:theme="@style/ProgressBar"/>
-        </FrameLayout>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
+            <!-- Photo grid header (title + date pill of the focused photo); hidden unless a
+                 fragment enables it, see VerticalCardGridFragment.usePhotoTiles -->
+            <LinearLayout
+                    android:id="@+id/grid_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
 
+                <TextView
+                        android:id="@+id/grid_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:focusable="false" />
+
+                <TextView
+                        android:id="@+id/grid_date_pill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:focusable="false"
+                        android:visibility="invisible" />
+            </LinearLayout>
+
+            <FrameLayout
+                    android:id="@+id/browse_grid_dock"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+                <ProgressBar
+                    android:id="@+id/browse_progressbar"
+                    android:visibility="visible"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:theme="@style/ProgressBar"/>
+            </FrameLayout>
+        </LinearLayout>
 
     </androidx.leanback.widget.BrowseFrameLayout>
 </FrameLayout>

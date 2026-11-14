@@ -5,6 +5,7 @@ import nl.giejay.android.tv.immich.api.ApiClient
 import nl.giejay.android.tv.immich.api.model.Asset
 
 class RandomAssetsFragment : GenericAssetFragment() {
+    override val gridTitle: String? = "Random"
 
     override suspend fun loadItems(
         apiClient: ApiClient,

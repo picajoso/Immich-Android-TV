@@ -2,15 +2,22 @@ package nl.giejay.android.tv.immich.shared.fragment
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.graphics.Typeface
 import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.leanback.app.BackgroundManager
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.FocusHighlight
 import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.VerticalGridPresenter
+import androidx.leanback.widget.VerticalGridView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +37,12 @@ import nl.giejay.android.tv.immich.api.ApiClient
 import nl.giejay.android.tv.immich.api.ApiClientConfig
 import nl.giejay.android.tv.immich.card.Card
 import nl.giejay.android.tv.immich.card.CardPresenterSelector
+import nl.giejay.android.tv.immich.card.PhotoGridLayout
+import nl.giejay.android.tv.immich.card.PhotoTilePresenter
+import nl.giejay.android.tv.immich.R
+import nl.giejay.android.tv.immich.ui.UiStyleProvider
+import java.util.Date
+import java.util.Locale
 import nl.giejay.android.tv.immich.home.HomeFragmentDirections
 import nl.giejay.android.tv.immich.shared.prefs.API_KEY
 import nl.giejay.android.tv.immich.shared.prefs.DEBUG_MODE
@@ -64,6 +77,24 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
     protected val selectionMode: Boolean
         get() = arguments?.getBoolean("selectionMode", false) ?: false
     private var currentSelectedIndex: Int = 0
+
+    /**
+     * Photo grids (Photos, Random, Recent, Favorites...) opt in to the redesigned layout: header with
+     * title + date pill, continuous grid of square tiles with width-driven column count.
+     */
+    protected open val usePhotoTiles: Boolean get() = false
+
+    /** Title shown in the header of a photo grid. */
+    protected open val photoGridTitle: String get() = ""
+
+    override val hideBrandedTitle: Boolean get() = usePhotoTiles
+
+    private var photoTilePresenter: PhotoTilePresenter? = null
+    private var datePill: TextView? = null
+
+    /** Number of columns of the photo grid; follows the width available (menu shown / hidden). */
+    protected var currentColumns: Int = COLUMNS
+        private set
 
     abstract fun sortItems(items: List<ITEM>): List<ITEM>
     abstract suspend fun loadItems(
@@ -109,7 +140,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 keyEvents.state.collect {
                     // open popup menu on the right side if its the last photo in the row and user presses right button
-                    if (it?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && ((adapter.size() == 0 && allPagesLoaded) || currentSelectedIndex > 0 && (currentSelectedIndex % COLUMNS == 3 || currentSelectedIndex + 1 == adapter.size()))) {
+                    if (it?.keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && ((adapter.size() == 0 && allPagesLoaded) || currentSelectedIndex > 0 && (currentSelectedIndex % currentColumns == currentColumns - 1 || currentSelectedIndex + 1 == adapter.size()))) {
                         openPopUpMenu()
                     } else if (it?.keyCode == KeyEvent.KEYCODE_FORWARD || it?.keyCode == KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD || it?.keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD) {
                         updateManualPositionHandler(adapter.size() - 1)
@@ -135,6 +166,9 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         }
         setOnItemViewSelectedListener { _, item, _, _ ->
             currentSelectedIndex = adapter.indexOf(item)
+            if (item is Card) {
+                onCardFocused(item, currentSelectedIndex)
+            }
             item?.let {
                 loadBackgroundDebounced((it as Card).backgroundUrl) {
                     loadBackgroundDebounced(it.thumbnailUrl) {
@@ -240,6 +274,10 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
     }
 
     private fun setupAdapter() {
+        if (usePhotoTiles) {
+            setupPhotoTileAdapter()
+            return
+        }
         val presenter = VerticalGridPresenter(ZOOM_FACTOR)
         
         val cols = try {
@@ -265,11 +303,114 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         adapter = ArrayObjectAdapter(cardPresenter)
     }
 
+    private fun setupPhotoTileAdapter() {
+        val tokens = UiStyleProvider.current()
+        // no zoom / dimmer / default shadow from Leanback: the tile does its own focus effect
+        val presenter = VerticalGridPresenter(FocusHighlight.ZOOM_FACTOR_NONE, false)
+        presenter.shadowEnabled = false
+        presenter.numberOfColumns = COLUMNS // replaced by the width-driven count in PhotoGridLayout
+        gridPresenter = presenter
+
+        val tiles = PhotoTilePresenter(requireContext(), tokens)
+        tiles.onLongClick = { card ->
+            if (card is Card) {
+                toggleFavorite(card)
+            }
+        }
+        photoTilePresenter = tiles
+        adapter = ArrayObjectAdapter(tiles)
+    }
+
+    override fun onGridViewCreated(gridView: VerticalGridView) {
+        super.onGridViewCreated(gridView)
+        if (!usePhotoTiles) return
+        val tokens = UiStyleProvider.current()
+        PhotoGridLayout(gridView, tokens) { columns, tileSize ->
+            currentColumns = columns
+            photoTilePresenter?.let {
+                it.tileSizePx = tileSize
+                // re-bind so existing tiles take the new size
+                if (adapter.size() > 0) {
+                    adapter.notifyArrayItemRangeChanged(0, adapter.size())
+                }
+            }
+        }.attach()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (usePhotoTiles) {
+            setupPhotoHeader(view)
+        }
+    }
+
+    private fun setupPhotoHeader(root: View) {
+        val tokens = UiStyleProvider.current()
+        val context = root.context
+        val header = root.findViewById<View>(R.id.grid_header) ?: return
+        val title = root.findViewById<TextView>(R.id.grid_title)
+        val pill = root.findViewById<TextView>(R.id.grid_date_pill)
+
+        header.visibility = View.VISIBLE
+        header.setPadding(
+            UiStyleProvider.dp(context, tokens.contentPaddingHDp),
+            UiStyleProvider.dp(context, tokens.contentPaddingTopDp),
+            UiStyleProvider.dp(context, tokens.contentPaddingHDp),
+            UiStyleProvider.dp(context, 15)
+        )
+        title.text = photoGridTitle
+        UiStyleProvider.applyTitle(title, tokens)
+
+        UiStyleProvider.applyBody(pill, tokens, tokens.bodySizeSp, tokens.dim)
+        pill.background = UiStyleProvider.pillBackground(context, tokens)
+        pill.setPadding(
+            UiStyleProvider.dp(context, 12),
+            UiStyleProvider.dp(context, 6),
+            UiStyleProvider.dp(context, 12),
+            UiStyleProvider.dp(context, 6)
+        )
+        datePill = pill
+    }
+
+    /** True while the date pill has no text yet. */
+    protected fun isDatePillEmpty(): Boolean = datePill?.text.isNullOrEmpty()
+
+    /** Called whenever the focused card changes; photo grids update their date pill here. */
+    protected open fun onCardFocused(card: Card, index: Int) {
+        // default: nothing
+    }
+
+    /**
+     * Shows "Wed, Nov 12, 2026 · City" in the header pill. Text only: no layout work besides the
+     * pill itself. The city part is omitted when unknown.
+     */
+    protected fun updateDatePill(date: Date?, city: String?) {
+        val pill = datePill ?: return
+        if (date == null) {
+            pill.text = ""
+            pill.visibility = View.INVISIBLE
+            return
+        }
+        val tokens = UiStyleProvider.current()
+        val locale = Locale.getDefault(Locale.Category.FORMAT)
+        val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "EEEMMMdyyyy")
+        val dateText = java.text.SimpleDateFormat(pattern, locale).format(date)
+        val text = SpannableStringBuilder(dateText)
+        text.setSpan(ForegroundColorSpan(tokens.text), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        if (!city.isNullOrBlank()) {
+            text.append("  \u00B7  ").append(city)
+        }
+        pill.text = text
+        pill.visibility = View.VISIBLE
+    }
+
     private fun setupBackgroundManager() {
         mBackgroundManager = BackgroundManager.getInstance(activity)
         if (!mBackgroundManager!!.isAttached) {
             mBackgroundManager!!.attach(requireActivity().window)
         }
+        mBackgroundManager!!.setColor(UiStyleProvider.current().bg)
         mMetrics = DisplayMetrics()
         requireActivity().windowManager.defaultDisplay.getMetrics(mMetrics)
     }
@@ -305,13 +446,14 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
     }
 
     private fun loadBackgroundDebounced(backgroundUrl: String?, onLoadFailed: () -> Unit) {
-        if (PreferenceManager.get(LOAD_BACKGROUND_IMAGE)) {
+        // the continuous photo grid has no room for a blurred background behind the tiles
+        if (!usePhotoTiles && PreferenceManager.get(LOAD_BACKGROUND_IMAGE)) {
             Debouncer.debounce("background", { loadBackground(backgroundUrl, onLoadFailed) }, 1, TimeUnit.SECONDS)
         }
     }
 
     private fun loadBackground(backgroundUrl: String?, onLoadFailed: () -> Unit) {
-        if (!isAdded || !PreferenceManager.get(LOAD_BACKGROUND_IMAGE)) {
+        if (!isAdded || usePhotoTiles || !PreferenceManager.get(LOAD_BACKGROUND_IMAGE)) {
             return
         }
         if (backgroundUrl.isNullOrEmpty()) {

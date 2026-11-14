@@ -8,6 +8,7 @@ import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.shared.prefs.SLIDER_SHOW_MEDIA_COUNT
 
 class AllAssetFragment : GenericAssetFragment() {
+    override val gridTitle: String? = "Photos"
 
     override suspend fun loadItems(
         apiClient: ApiClient,

@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row_root"
     android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
+    <!-- section icon, tinted by the active UiStyle -->
     <ImageView
-        android:layout_width="22dp"
+        android:id="@+id/row_nav_icon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginEnd="9dp"
+        android:importantForAccessibility="no" />
+    <!-- edit mode: show/hide eye -->
+    <ImageView
+        android:layout_width="11dp"
         android:id="@+id/row_visible"
         android:src="@drawable/closed_eye"
         android:visibility="gone"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="10dp"
-        android:layout_height="22dp"></ImageView>
+        android:layout_marginEnd="5dp"
+        android:layout_height="11dp" />
     <TextView android:id="@+id/tvTitle"
-        android:layout_width="match_parent"
-        android:textSize="20sp"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textSize="13sp"
         android:layout_height="wrap_content"
+        android:singleLine="true"
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"

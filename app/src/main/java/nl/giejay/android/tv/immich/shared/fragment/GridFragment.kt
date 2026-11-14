@@ -30,6 +30,7 @@ import androidx.leanback.widget.OnChildLaidOutListener
 import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.OnItemViewSelectedListener
 import androidx.leanback.widget.VerticalGridPresenter
+import androidx.leanback.widget.VerticalGridView
 import nl.giejay.android.tv.immich.R
 import timber.log.Timber
 
@@ -110,7 +111,18 @@ open class GridFragment(val hideProgressBar: Boolean = false) : BrandedSupportFr
         showOrHideTitle()
     }
 
+    /** When true the Leanback title bar is never shown (the fragment draws its own header). */
+    protected open val hideBrandedTitle: Boolean = false
+
+    /** Called once the grid view exists, before the first adapter bind. */
+    protected open fun onGridViewCreated(gridView: VerticalGridView) {}
+
     private fun showOrHideTitle() {
+        if (hideBrandedTitle) {
+            showTitle(false)
+            mMainFragmentAdapter.fragmentHost?.showTitleView(false)
+            return
+        }
         if (mGridViewHolder!!.gridView.findViewHolderForAdapterPosition(mSelectedPosition)
             == null
         ) {
@@ -158,9 +170,13 @@ open class GridFragment(val hideProgressBar: Boolean = false) : BrandedSupportFr
             progressBar?.visibility = View.GONE
         }
         installTitleView(LayoutInflater.from(requireContext()), gridDock, savedInstanceState)
+        if (hideBrandedTitle) {
+            showTitle(false)
+        }
         mGridViewHolder = mGridPresenter?.onCreateViewHolder(gridDock)
         mGridViewHolder?.view?.apply { gridDock.addView(this) }
         mGridViewHolder?.gridView?.setOnChildLaidOutListener(mChildLaidOutListener)
+        mGridViewHolder?.gridView?.let { onGridViewCreated(it) }
         mSceneAfterEntranceTransition =
             TransitionHelper.createScene(gridDock) { setEntranceTransitionState(true) }
         mainFragmentAdapter.fragmentHost?.notifyViewCreated(mMainFragmentAdapter)

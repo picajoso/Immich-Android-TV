@@ -1,7 +1,10 @@
 package nl.giejay.android.tv.immich.home
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.leanback.app.BrowseSupportFragment
@@ -14,7 +17,6 @@ import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.PageRow
 import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.Row
-import androidx.leanback.widget.RowHeaderPresenter
 import androidx.leanback.widget.SectionRow
 import nl.giejay.android.tv.immich.album.AlbumFragment
 import nl.giejay.android.tv.immich.assets.AllAssetFragment
@@ -31,11 +33,16 @@ import nl.giejay.android.tv.immich.shared.fragment.GridFragment
 import nl.giejay.android.tv.immich.shared.prefs.HIDDEN_HOME_ITEMS
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.assets.IntegratedTimelineFragment
+import nl.giejay.android.tv.immich.ui.UiStyleProvider
 import timber.log.Timber
 
 class HomeFragment : BrowseSupportFragment() {
     private lateinit var mRowsAdapter: ArrayObjectAdapter
-    private lateinit var rows: List<PageRow>
+    private lateinit var pageRows: Map<String, PageRow>
+    private val sectionRows: List<SectionRow> by lazy {
+        GROUPS.mapIndexed { index, group -> SectionRow(HeaderItem(-(index + 1).toLong(), group.first)) }
+    }
+    private var edgeHint: View? = null
     val immichRowPresenter = ImmichRowPresenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,16 +63,18 @@ class HomeFragment : BrowseSupportFragment() {
             selectedPosition = row?.let { mRowsAdapter.indexOf(it) } ?: 0
         }
 
+        setupEdgeHint(view)
+
+        if (savedInstanceState == null) {
+            // position 0 is a (non selectable) group label, start on the first page
+            val firstPage = (0 until mRowsAdapter.size()).firstOrNull { mRowsAdapter.get(it) is PageRow } ?: 0
+            setSelectedPosition(firstPage, false)
+        }
+
         headersSupportFragment.setOnHeaderClickedListener { _, row ->
             if (row.headerItem.name == "Edit") {
                 immichRowPresenter.editMode = !immichRowPresenter.editMode
-                if(immichRowPresenter.editMode){
-                    mRowsAdapter.clear()
-                    mRowsAdapter.addAll(0, rows.filter { it.headerItem.name != "Settings" })
-                } else {
-                    mRowsAdapter.clear();
-                    mRowsAdapter.addAll(0, rows.filter { !PreferenceManager.itemInStringSet(it.headerItem.name, HIDDEN_HOME_ITEMS) })
-                }
+                rebuildRows()
                 adapter.notifyItemRangeChanged(0, mRowsAdapter.size());
             } else if(immichRowPresenter.editMode){
                 PreferenceManager.toggleStringSetItem(row.headerItem.name, HIDDEN_HOME_ITEMS)
@@ -81,14 +90,15 @@ class HomeFragment : BrowseSupportFragment() {
     private fun setupUi() {
         headersState = HEADERS_ENABLED
         isHeadersTransitionOnBackEnabled = true
-        brandColor = resources.getColor(android.R.color.black)
-        title = "Albums"
+        // sidebar background of the active interface style
+        brandColor = UiStyleProvider.current().sidebar
+        title = "Photos"
 
         val sHeaderPresenter: PresenterSelector = ClassPresenterSelector()
             .addClassPresenter(DividerRow::class.java, DividerPresenter())
             .addClassPresenter(
                 SectionRow::class.java,
-                RowHeaderPresenter()
+                SectionHeaderPresenter()
             )
             .addClassPresenter(Row::class.java, immichRowPresenter)
 
@@ -98,13 +108,64 @@ class HomeFragment : BrowseSupportFragment() {
     private fun loadData() {
         mRowsAdapter = ArrayObjectAdapter(ListRowPresenter())
         adapter = mRowsAdapter
-        rows = createRows()
-        mRowsAdapter.addAll(0, rows.filter { !PreferenceManager.itemInStringSet(it.headerItem.name, HIDDEN_HOME_ITEMS) })
+        pageRows = createRows()
+        rebuildRows()
     }
 
-    private fun createRows(): List<PageRow> {
-        return HEADERS.mapIndexed { index, header -> PageRow(HeaderItem(index.toLong(), header.name))
+    private fun createRows(): Map<String, PageRow> {
+        return HEADERS.mapIndexed { index, header -> header.name to PageRow(HeaderItem(index.toLong(), header.name)) }.toMap()
+    }
+
+    /**
+     * Fills the side menu: group labels followed by their entries, Settings last.
+     * In edit mode all entries (except Settings) are listed so they can be hidden/shown.
+     */
+    private fun rebuildRows() {
+        fun visible(name: String): Boolean =
+            immichRowPresenter.editMode || !PreferenceManager.itemInStringSet(name, HIDDEN_HOME_ITEMS)
+
+        val items = mutableListOf<Row>()
+        GROUPS.forEachIndexed { index, group ->
+            val groupRows = group.second.filter { visible(it) }.mapNotNull { pageRows[it] }
+            if (groupRows.isNotEmpty()) {
+                items.add(sectionRows[index])
+                items.addAll(groupRows)
+            }
         }
+        if (!immichRowPresenter.editMode) {
+            pageRows["Settings"]?.let { items.add(it) }
+        }
+        mRowsAdapter.clear()
+        mRowsAdapter.addAll(0, items)
+    }
+
+    /** Thin tab at the left edge, shown while the menu is hidden, hinting that left reopens it. */
+    private fun setupEdgeHint(root: View) {
+        val frame = root as? FrameLayout ?: return
+        val tokens = UiStyleProvider.current()
+        val context = root.context
+        val hint = View(context)
+        hint.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            val r = UiStyleProvider.dp(context, 3).toFloat()
+            // rounded on the right side only
+            cornerRadii = floatArrayOf(0f, 0f, r, r, r, r, 0f, 0f)
+            setColor((tokens.dim and 0x00FFFFFF) or (0x99 shl 24))
+        }
+        val lp = FrameLayout.LayoutParams(UiStyleProvider.dp(context, 3), UiStyleProvider.dp(context, 60))
+        lp.gravity = Gravity.START or Gravity.CENTER_VERTICAL
+        hint.visibility = View.GONE
+        frame.addView(hint, lp)
+        edgeHint = hint
+        setBrowseTransitionListener(object : BrowseTransitionListener() {
+            override fun onHeadersTransitionStart(withHeaders: Boolean) {
+                if (withHeaders) hint.visibility = View.GONE
+            }
+
+            override fun onHeadersTransitionStop(withHeaders: Boolean) {
+                hint.visibility = if (withHeaders) View.GONE else View.VISIBLE
+            }
+        })
     }
 
     private class PageRowFragmentFactory : FragmentFactory<Fragment>() {
@@ -116,6 +177,12 @@ class HomeFragment : BrowseSupportFragment() {
     }
 
     companion object {
+        /** Side menu groups, in display order (Settings is appended after the groups). */
+        private val GROUPS: List<Pair<String, List<String>>> = listOf(
+            "Library" to listOf("Photos", "Albums", "People", "Favorites", "Recent", "Random"),
+            "Collections" to listOf("On this day", "Seasonal", "Timeline", "Folders", "Edit")
+        )
+
         private val HEADERS: List<Header> = listOf(
             Header("Albums") {
                 AlbumFragment().apply {

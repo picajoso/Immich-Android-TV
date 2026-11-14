@@ -10,10 +10,10 @@
     <dimen name="card_width_5_cols">140dp</dimen>
     <dimen name="card_height_5_cols">79dp</dimen>
 
-    <dimen name="lb_browse_headers_width">160dp</dimen>
+    <dimen name="lb_browse_headers_width">200dp</dimen>
     <dimen name="lb_browse_header_padding_end">12dp</dimen>
     
-    <dimen name="lb_browse_rows_margin_start">190dp</dimen>
+    <dimen name="lb_browse_rows_margin_start">200dp</dimen>
 
     <dimen name="image_card_width">175dp</dimen>
     <dimen name="image_card_height">98dp</dimen> <dimen name="grid_card_width">175dp</dimen>

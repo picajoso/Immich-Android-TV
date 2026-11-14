@@ -17,19 +17,22 @@ import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import timber.log.Timber
 
 class FavoritesBrowseFragment : GenericAssetFragment() {
+    override val gridTitle: String? = "Favorites"
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = "Favorites"
         
-        // Asegurar grid 3x3 (o el número configurado)
-        val cols = try {
-            PreferenceManager.get(GRID_COLUMN_COUNT)
-        } catch (e: Exception) { 3 }
-        
-        (gridPresenter as? VerticalGridPresenter)?.apply {
-            numberOfColumns = cols
-            shadowEnabled = true
+        if (!usePhotoTiles) {
+            // Asegurar grid 3x3 (o el número configurado)
+            val cols = try {
+                PreferenceManager.get(GRID_COLUMN_COUNT)
+            } catch (e: Exception) { 3 }
+
+            (gridPresenter as? VerticalGridPresenter)?.apply {
+                numberOfColumns = cols
+                shadowEnabled = true
+            }
         }
         
         // CLAVE: Escuchar cambios de favoritos desde otras pantallas

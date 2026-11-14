@@ -23,6 +23,12 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
     protected lateinit var currentFilter: ContentType
     protected lateinit var currentSort: PhotosOrder
 
+    /** Photo grids that return a title here use the redesigned tile grid + date pill. */
+    open val gridTitle: String? get() = null
+
+    override val usePhotoTiles: Boolean get() = gridTitle != null
+    override val photoGridTitle: String get() = gridTitle ?: ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val sortingKey = getSortingKey()
         val filterKey = getFilterKey()
@@ -236,6 +242,27 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
 
     override fun sortItems(items: List<Asset>): List<Asset> {
         return items.sortedWith(currentSort.sort)
+    }
+
+    override fun onCardFocused(card: Card, index: Int) {
+        if (!usePhotoTiles) return
+        // adapter order normally equals the order of `assets`; fall back to a lookup by id
+        val asset = assets.getOrNull(index)?.takeIf { it.id == card.id }
+            ?: assets.firstOrNull { it.id == card.id }
+        updateDatePill(
+            asset?.let { it.exifInfo?.dateTimeOriginal ?: it.fileModifiedAt },
+            asset?.exifInfo?.city
+        )
+    }
+
+    override fun setData(assets: List<Asset>) {
+        super.setData(assets)
+        // first batch: show the date of the first photo until the user moves the focus
+        if (usePhotoTiles && isDatePillEmpty()) {
+            this.assets.firstOrNull()?.let { first ->
+                updateDatePill(first.exifInfo?.dateTimeOriginal ?: first.fileModifiedAt, first.exifInfo?.city)
+            }
+        }
     }
 
     override fun onItemSelected(card: Card, indexOf: Int) {
