@@ -8,6 +8,9 @@ on:
     branches: [ "redesign-ui" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,7 +40,22 @@ jobs:
         </resources>
         XML
     - name: Build debug APK
-      run: chmod +x gradlew && ./gradlew assembleDebug --stacktrace
+      run: |
+        chmod +x gradlew
+        set -o pipefail
+        ./gradlew assembleDebug --stacktrace 2>&1 | tee build.log
+    - name: Publish build log to ci-log branch on failure
+      if: failure()
+      run: |
+        cp build.log /tmp/build.log
+        grep -E "^e: |error:|FAILURE|What went wrong" -A3 /tmp/build.log | head -400 > /tmp/errors.txt || true
+        git config user.name ci-bot && git config user.email ci-bot@users.noreply.github.com
+        git checkout --orphan ci-log
+        git rm -rfq --cached . >/dev/null
+        cp /tmp/build.log /tmp/errors.txt .
+        git add build.log errors.txt
+        git commit -qm "build log ${GITHUB_SHA}"
+        git push -f origin ci-log
     - name: Upload debug APK
       uses: actions/upload-artifact@v4
       with:
