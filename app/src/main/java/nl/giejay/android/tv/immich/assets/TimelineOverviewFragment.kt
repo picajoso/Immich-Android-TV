@@ -144,7 +144,7 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
         monthPresenter = MonthCellPresenter(tokens) { cell ->
             cell.timeBucket?.let { openMonth(it) }
         }
-        monthAdapter = ArrayObjectAdapter(monthPresenter)
+        monthAdapter = ArrayObjectAdapter(monthPresenter!!)
         monthsGrid.adapter = ItemBridgeAdapter(monthAdapter)
         loadBuckets()
     }
