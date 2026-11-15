@@ -15,7 +15,8 @@ import android.widget.LinearLayout
 open class FocusCardView(
     context: Context,
     private val tokens: UiTokens,
-    private val focusScale: Float = tokens.focusScale
+    private val focusScale: Float = tokens.focusScale,
+    private val radiusDp: Float? = null
 ) : FrameLayout(context) {
 
     /** Called when the card gains focus. */
@@ -25,8 +26,8 @@ open class FocusCardView(
         isFocusable = true
         isFocusableInTouchMode = true
         isClickable = true
-        foreground = UiStyleProvider.tileFocusRing(context, tokens)
-        val radius = UiStyleProvider.dp(context, tokens.tileRadiusDp).toFloat()
+        foreground = UiStyleProvider.tileFocusRing(context, tokens, radiusDp)
+        val radius = UiStyleProvider.dp(context, radiusDp ?: tokens.tileRadiusDp).toFloat()
         outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
                 outline.setRoundRect(0, 0, view.width, view.height, radius)

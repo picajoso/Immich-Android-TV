@@ -173,10 +173,10 @@ object UiStyleProvider {
         )
 
     /** Ring drawn on top of a focused tile. */
-    fun tileFocusRing(context: Context, t: UiTokens): StateListDrawable {
+    fun tileFocusRing(context: Context, t: UiTokens, radiusDp: Float? = null): StateListDrawable {
         val ring = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = dp(context, t.focusedTileRadiusDp).toFloat()
+            cornerRadius = dp(context, radiusDp ?: t.focusedTileRadiusDp).toFloat()
             setColor(Color.TRANSPARENT)
             setStroke(dp(context, 2f), t.focusRing)
         }

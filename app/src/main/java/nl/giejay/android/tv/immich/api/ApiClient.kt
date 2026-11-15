@@ -96,6 +96,12 @@ class ApiClient(private val config: ApiClientConfig) {
     }
     // ------------------------------------------------
 
+    /** Albums owned by the user. */
+    suspend fun listMyAlbums(): Either<String, List<Album>> = executeAPICall(200) { service.listAlbums() }
+
+    /** Albums shared with / by the user. */
+    suspend fun listSharedAlbums(): Either<String, List<Album>> = executeAPICall(200) { service.listAlbums(true) }
+
     suspend fun listAlbums(): Either<String, List<Album>> {
         return executeAPICall(200) { service.listAlbums() }.flatMap { albums ->
             return executeAPICall(200) { service.listAlbums(true) }.map { sharedAlbums ->

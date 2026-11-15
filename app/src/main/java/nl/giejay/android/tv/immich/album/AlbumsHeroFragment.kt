@@ -31,6 +31,7 @@ import nl.giejay.android.tv.immich.api.util.ApiUtil
 import nl.giejay.android.tv.immich.home.HomeFragmentDirections
 import nl.giejay.android.tv.immich.shared.prefs.ALBUMS_SORTING
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
+import nl.giejay.android.tv.immich.shared.prefs.UiStyle
 import nl.giejay.android.tv.immich.shared.util.currentApiClient
 import nl.giejay.android.tv.immich.ui.FocusCardView
 import nl.giejay.android.tv.immich.ui.UiStyleProvider
@@ -61,9 +62,19 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
         return mMainFragmentAdapter
     }
 
+    private var appleView: AppleAlbumsView? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         tokens = UiStyleProvider.current()
         val ctx = requireContext()
+        if (tokens.style == UiStyle.APPLE) {
+            // Apple: latest album as a fixed hero, "My Albums" / "Shared Albums" rows (apple-05)
+            return AppleAlbumsView(ctx, tokens) { album ->
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToAlbumDetailsFragment(album.id, album.albumName)
+                )
+            }.also { appleView = it }
+        }
         val root = FrameLayout(ctx)
         root.setBackgroundColor(tokens.bg)
         val topOffset = UiStyleProvider.dp(ctx, 65)
@@ -130,8 +141,39 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
         loadAlbums()
     }
 
+    private fun sortAlbums(albums: List<Album>): List<Album> = try {
+        albums.sortedWith(PreferenceManager.get(ALBUMS_SORTING).sort)
+    } catch (e: IllegalArgumentException) {
+        albums
+    }
+
+    /** Apple: own albums show up as soon as they arrive, the (slower) shared list follows. */
+    private fun loadAppleAlbums(client: nl.giejay.android.tv.immich.api.ApiClient) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val mine = withContext(Dispatchers.IO) { client.listMyAlbums() }
+            val view = appleView ?: return@launch
+            mine.fold({ Timber.e("Could not load albums: $it") }, { albums ->
+                view.setMyAlbums(sortAlbums(albums))
+                // the most recent album (date of its newest photo), whatever the sorting of the rows;
+                // empty albums have no cover, so they cannot be the hero
+                albums.filter { it.assetCount > 0 && it.albumThumbnailAssetId != null }
+                    .maxByOrNull { (it.endDate ?: it.updatedAt).time }
+                    ?.let { view.showHero(it) }
+            })
+            val shared = withContext(Dispatchers.IO) { client.listSharedAlbums() }
+            val mineIds = (mine.getOrNull() ?: emptyList()).map { it.id }.toSet()
+            shared.fold({ Timber.e("Could not load shared albums: $it") }, { albums ->
+                appleView?.setSharedAlbums(sortAlbums(albums.filter { it.id !in mineIds }))
+            })
+        }
+    }
+
     private fun loadAlbums() {
         val client = currentApiClient() ?: return
+        if (appleView != null) {
+            loadAppleAlbums(client)
+            return
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) { client.listAlbums() }
             result.fold(
@@ -190,6 +232,7 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
         super.onDestroyView()
         pendingHero?.let { handler.removeCallbacks(it) }
         shownHeroId = null
+        appleView = null
     }
 }
 
