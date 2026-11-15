@@ -10,5 +10,7 @@ data class SearchRequest(val page: Int = 0,
                          val takenBefore: String? = null,
                          val takenAfter: String? = null,
                          val withExif: Boolean = true,
-                         val isFavorite: Boolean? = null
+                         val isFavorite: Boolean? = null,
+    /** only assets uploaded after this instant ("Recently added") */
+    val createdAfter: String? = null
 )

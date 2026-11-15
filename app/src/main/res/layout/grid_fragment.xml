@@ -76,6 +76,16 @@
                             android:singleLine="true"
                             android:focusable="true"
                             android:clickable="true" />
+
+                    <TextView
+                            android:id="@+id/grid_action_alt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="7dp"
+                            android:singleLine="true"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:visibility="gone" />
                 </LinearLayout>
 
                 <TextView

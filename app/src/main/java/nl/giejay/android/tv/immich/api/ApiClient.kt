@@ -135,6 +135,14 @@ class ApiClient(private val config: ApiClientConfig) {
         }
     }
 
+    /** "Recently added": uploaded in the last [months] months, newest first. */
+    suspend fun recentlyAddedAssets(page: Int, pageCount: Int, contentType: ContentType, months: Long): Either<String, List<Asset>> =
+        listAssets(page, pageCount, false, "desc", contentType = contentType, createdAfter = LocalDateTime.now().minusMonths(months))
+
+    /** "Recently taken": newest photos by capture date. */
+    suspend fun recentlyTakenAssets(page: Int, pageCount: Int, contentType: ContentType): Either<String, List<Asset>> =
+        listAssets(page, pageCount, false, "desc", contentType = contentType)
+
     suspend fun recentAssets(page: Int, pageCount: Int, contentType: ContentType): Either<String, List<Asset>> {
         val now = LocalDateTime.now()
         return listAssets(page, pageCount, true, "desc",
@@ -226,7 +234,8 @@ class ApiClient(private val config: ApiClientConfig) {
                        fromDate: LocalDateTime? = null,
                        endDate: LocalDateTime? = null,
                        contentType: ContentType,
-                       isFavorite: Boolean? = null): Either<String, List<Asset>> {  // ← AÑADIR PARÁMETRO
+                       isFavorite: Boolean? = null,
+                       createdAfter: LocalDateTime? = null): Either<String, List<Asset>> {  // ← AÑADIR PARÁMETRO
     val searchRequest = SearchRequest(page,
         pageCount,
         order,
@@ -235,7 +244,8 @@ class ApiClient(private val config: ApiClientConfig) {
         endDate?.format(dateTimeFormatter),
         fromDate?.format(dateTimeFormatter),
         true,              // ← withExif (mantener existente)
-        isFavorite)        // ← AÑADIR ESTE PARÁMETRO
+        isFavorite,        // ← AÑADIR ESTE PARÁMETRO
+        createdAfter?.format(dateTimeFormatter))
         return (if (random) {
             executeAPICall(200) { service.randomAssets(searchRequest) }
         } else {

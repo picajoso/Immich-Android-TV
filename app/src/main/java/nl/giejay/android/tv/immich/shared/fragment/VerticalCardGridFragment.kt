@@ -533,6 +533,72 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
 
     private var photoGridView: VerticalGridView? = null
 
+    /**
+     * Two pill tabs before the date pill (Recent: "Recently added" / "Recently taken"). The selected
+     * one is the filled pill; OK on the other one selects it.
+     */
+    protected fun setHeaderTabs(first: String, second: String, selected: Int, onSelect: (Int) -> Unit) {
+        val root = view ?: return
+        val extra = root.findViewById<View>(R.id.grid_header_extra) ?: return
+        val a = root.findViewById<TextView>(R.id.grid_action_main) ?: return
+        val b = root.findViewById<TextView>(R.id.grid_action_alt) ?: return
+        val tokens = UiStyleProvider.current()
+        val ctx = root.context
+        val tabs = listOf(a to first, b to second)
+        fun style(current: Int) {
+            tabs.forEachIndexed { i, (view, label) ->
+                val on = i == current
+                UiStyleProvider.applyBody(view, tokens, 12.5f, if (on) tokens.selectedRowText else tokens.text)
+                if (on) view.typeface = UiStyleProvider.titleTypeface(tokens)
+                view.includeFontPadding = false
+                view.text = label
+                view.setCompoundDrawablesRelative(null, null, null, null)
+                view.setPadding(UiStyleProvider.dp(ctx, 12), UiStyleProvider.dp(ctx, 6), UiStyleProvider.dp(ctx, 12), UiStyleProvider.dp(ctx, 6))
+                fun pill(stroke: Boolean) = android.graphics.drawable.GradientDrawable().apply {
+                    cornerRadius = UiStyleProvider.dp(ctx, 500).toFloat()
+                    setColor(if (on) tokens.selectedRow else tokens.pillBg)
+                    if (stroke) setStroke(UiStyleProvider.dp(ctx, 2f), tokens.focusRing)
+                }
+                view.background = android.graphics.drawable.StateListDrawable().apply {
+                    addState(intArrayOf(android.R.attr.state_focused), pill(true))
+                    addState(intArrayOf(), pill(false))
+                }
+            }
+        }
+        style(selected)
+        tabs.forEachIndexed { i, (view, _) ->
+            view.setOnClickListener {
+                style(i)
+                onSelect(i)
+            }
+        }
+        root.findViewById<TextView>(R.id.grid_info)?.visibility = View.GONE
+        b.visibility = View.VISIBLE
+        extra.visibility = View.VISIBLE
+        // the tabs are reachable like any header action: not before the grid had the focus
+        a.isFocusable = false
+        b.isFocusable = false
+        val listener = object : android.view.ViewTreeObserver.OnGlobalFocusChangeListener {
+            override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
+                val grid = photoGridView ?: return
+                if (newFocus != null && newFocus !== a && newFocus !== b && grid.hasFocus()) {
+                    a.isFocusable = true
+                    b.isFocusable = true
+                    grid.setOnKeyInterceptListener { event ->
+                        if (event.keyCode == android.view.KeyEvent.KEYCODE_DPAD_UP && event.action == android.view.KeyEvent.ACTION_DOWN &&
+                            grid.selectedPosition in 0 until currentColumns
+                        ) {
+                            a.requestFocus()
+                            true
+                        } else false
+                    }
+                    root.viewTreeObserver.removeOnGlobalFocusChangeListener(this)
+                }
+            }
+        }
+        root.viewTreeObserver.addOnGlobalFocusChangeListener(listener)
+    }
+
     /** True while the date pill has no text yet. */
     protected fun isDatePillEmpty(): Boolean = datePill?.text.isNullOrEmpty()
 
