@@ -1,6 +1,6 @@
 name: Compile check
 
-# Debug build with placeholder Firebase/strings files, so pull requests can be
+# Debug build with a placeholder strings file, so pull requests can be
 # compiled without the release secrets.
 on:
   pull_request:
@@ -23,16 +23,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-    - name: Placeholder google-services.json and strings_other.xml
+    - name: Placeholder strings_other.xml
       run: |
-        cat > app/google-services.json <<'JSON'
-        {"project_info":{"project_number":"000000000000","project_id":"compile-check","storage_bucket":"compile-check.appspot.com"},
-         "client":[{"client_info":{"mobilesdk_app_id":"1:000000000000:android:0000000000000000","android_client_info":{"package_name":"nl.giejay.android.tv.immich"}},
-                    "oauth_client":[],"api_key":[{"current_key":"placeholder"}],"services":{"appinvite_service":{"other_platform_oauth_client":[]}}},
-                    {"client_info":{"mobilesdk_app_id":"1:000000000000:android:0000000000000001","android_client_info":{"package_name":"nl.giejay.android.tv.immich.debug"}},
-                    "oauth_client":[],"api_key":[{"current_key":"placeholder"}],"services":{"appinvite_service":{"other_platform_oauth_client":[]}}}],
-         "configuration_version":"1"}
-        JSON
         cat > app/src/main/res/values/strings_other.xml <<'XML'
         <?xml version="1.0" encoding="utf-8"?>
         <resources>

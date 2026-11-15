@@ -16,8 +16,6 @@
 
 plugins {
     id 'com.android.application'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
     id 'org.jetbrains.kotlin.android' version "${kotlin_version}"
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
@@ -27,7 +25,9 @@ plugins {
 android {
     compileSdk = 35
     defaultConfig {
-        applicationId "nl.giejay.android.tv.immich"
+        // The code lives in the nl.giejay.android.tv.immich namespace (see below); the installed app is
+        // identified by this id.
+        applicationId "javipas.android.tv.immich"
         minSdkVersion 24
         targetSdkVersion 35
         versionCode 323
@@ -59,7 +59,7 @@ android {
 
     buildTypes {
         debug {
-            // Installs next to the release build instead of clashing with its signature.
+            // Installs next to the release build (javipas.android.tv.immich) instead of clashing with its signature.
             applicationIdSuffix ".debug"
         }
         release {
@@ -126,9 +126,6 @@ dependencies {
     implementation "androidx.leanback:leanback-preference:$leanback_version"
     implementation 'io.arrow-kt:arrow-core:1.2.0'
 
-    implementation platform('com.google.firebase:firebase-bom:33.16.0')
-    implementation 'com.google.firebase:firebase-crashlytics'
-    implementation("com.google.firebase:firebase-analytics")
 
     // Cast library used for Cast Connect feature
 //    implementation "com.google.android.gms:play-services-cast-tv:$cast_tv_version"
@@ -160,6 +157,8 @@ dependencies {
     implementation "com.google.android.gms:play-services-auth:$playservices_version"
 
     // Retrofit for HTTP requests
+    // okio 3 (the response logger uses its Kotlin API); it used to arrive through Firebase
+    implementation 'com.squareup.okio:okio:3.4.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
 

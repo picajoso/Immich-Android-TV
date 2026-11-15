@@ -72,14 +72,20 @@ And also:
 |         ![Alt text](/screenshots/home-edit.png?raw=true "Edit homescreen")         | ![Alt text](/screenshots/settings-view.png?raw=true "View settings") | ![Alt text](/screenshots/settings-screensaver.png?raw=true "Screensaver settings") |
 | ![Alt text](/screenshots/screensaver-portrait.png?raw=true "Screensaver portrait") |        ![Alt text](/screenshots/people.png?raw=true "People")        |             ![Alt text](/screenshots/seasonl.png?raw=true "Seasonal")              |
 
+## About this fork
+
+Immich TV is a fork of [Immich-Android-TV](https://github.com/giejay/Immich-Android-TV) by
+**giejay**, which started it and wrote most of the original code. This fork has since gone its own
+way: a redesigned interface (Apple and Google TV styles), its own viewer, caching, translations and
+its own application id (`javipas.android.tv.immich`). It is not affiliated with the original
+project. See [NOTICE.md](NOTICE.md) for the copyright and licence details.
+
 ## Build steps
 
-1. Clone project with `git clone --recurse git@github.com:giejay/Immich-Android-TV.git`
-2. Create an account at firebase and create a google-services.json file, or
-   `cp apps/google-services.example apps/google-services.json`
-3. copy app/src/strings_other.xml.example to app/src/main/res/values/strings_other.xml and modify
+1. Clone project with `git clone --recurse git@github.com:picajoso/Immich-Android-TV.git`
+2. copy app/src/strings_other.xml.example to app/src/main/res/values/strings_other.xml and modify
    the address and API keys for your demo server.
-4. Build apk with `./gradlew assembleRelease`
+3. Build apk with `./gradlew assembleRelease`
 
 ## Support the project
 
@@ -104,5 +110,5 @@ might consider buying me a coffee or a beer:
 4. After downloading/installing ADB on the PC, connect to the device using it's IP: adb connect
    192.168.xx.xx.
 5. Once you are connected, execute the following command: 'adb shell settings put secure
-   screensaver_components nl.giejay.android.tv.immich/.screensaver.ScreenSaverService'
+   screensaver_components javipas.android.tv.immich/nl.giejay.android.tv.immich.screensaver.ScreenSaverService'
 6. Done!

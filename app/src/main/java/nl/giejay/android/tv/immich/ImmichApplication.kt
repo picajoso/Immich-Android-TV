@@ -22,7 +22,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import nl.giejay.android.tv.immich.shared.prefs.DEBUG_MODE
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.shared.prefs.USER_ID
@@ -46,7 +45,7 @@ class ImmichApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {
-            Timber.plant(CrashReportingTree())
+            Timber.plant(ReleaseTree())
         }
 
         UiFonts.preload(this, UiStyleProvider.currentStyle())
@@ -56,26 +55,19 @@ class ImmichApplication : Application() {
             userId = UUID.randomUUID().toString()
             PreferenceManager.save(USER_ID, userId)
         }
-        FirebaseCrashlytics.getInstance().setUserId(userId)
     }
 
     companion object {
         var appContext: Context? = null
     }
 
-    private class CrashReportingTree : Timber.Tree() {
-        val instance = FirebaseCrashlytics.getInstance()
-
+    /** Release builds: warnings and errors (and debug lines when "debug mode" is on) go to logcat only. */
+    private class ReleaseTree : Timber.Tree() {
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
             if (priority == Log.VERBOSE || (priority == Log.DEBUG && !PreferenceManager.get(DEBUG_MODE))) {
                 return
             }
-            instance.log("$tag : $message")
-            if (t != null) {
-                instance.recordException(t)
-            } else if (priority == Log.ERROR) {
-                instance.recordException(UnknownError(message))
-            }
+            Log.println(priority, tag ?: "ImmichTV", if (t != null) "$message\n${Log.getStackTraceString(t)}" else message)
         }
     }
 }
