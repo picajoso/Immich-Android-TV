@@ -8,6 +8,7 @@ import nl.giejay.android.tv.immich.R
 
 class ImmichRowViewHolder(view: View) : RowHeaderPresenter.ViewHolder(view) {
     val root: View = view
+    var tag: Any? = null
     val tvTitle: TextView
     val icon: ImageView
     val navIcon: ImageView

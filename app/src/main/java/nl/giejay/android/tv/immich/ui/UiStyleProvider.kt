@@ -107,7 +107,7 @@ object UiStyleProvider {
         tileRadiusDp = 6f,
         focusedTileRadiusDp = 6f,
         gridGapDp = 8f,
-        focusScale = 1.09f,
+        focusScale = 1.08f,
         gridCellDp = 103f,
         sidebarWidthDp = 200,
         contentPaddingHDp = 40,

@@ -57,6 +57,13 @@ class MainActivity : FragmentActivity() {
      * The interface is laid out 1:1 against 1080p designs: text ignores the system font scale so
      * sizes and line breaks match the references (decision of the app owner).
      */
+    override fun onApplyThemeResource(theme: android.content.res.Resources.Theme, resid: Int, first: Boolean) {
+        super.onApplyThemeResource(theme, resid, first)
+        if (UiStyleProvider.currentStyle() == nl.giejay.android.tv.immich.shared.prefs.UiStyle.GOOGLE_TV) {
+            theme.applyStyle(R.style.UiOverlayGoogleTv, true)
+        }
+    }
+
     override fun attachBaseContext(newBase: android.content.Context) {
         val config = android.content.res.Configuration(newBase.resources.configuration)
         config.fontScale = 1f

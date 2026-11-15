@@ -59,6 +59,12 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
+/** Applies the style's title typeface to a span of a TextView (StyleSpan only knows bold / italic). */
+private class MediumSpan(private val typeface: Typeface) : android.text.style.MetricAffectingSpan() {
+    override fun updateDrawState(paint: android.text.TextPaint) { paint.typeface = typeface }
+    override fun updateMeasureState(paint: android.text.TextPaint) { paint.typeface = typeface }
+}
+
 abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
     protected var assets: List<ITEM> = emptyList()
     protected val startPage = 1
@@ -341,7 +347,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         }.also {
             // grids that are not a page of the home browse have no menu next to them
             menuShown = hostedInBrowse
-            it.menuShown = menuShown
+            it.menuShown = menuShown && menuPushesContent
             it.attach()
         }
     }
@@ -352,13 +358,15 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
      * The side menu only exists while this grid is a page of the home browse (Photos, Random...).
      * Grids opened on their own (the month view) are full screen.
      */
+    /** Apple's menu pushes the content aside, Google TV's drawer overlays it (see MainActivity). */
+    private val menuPushesContent: Boolean get() = UiStyleProvider.current().style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.APPLE
     private val hostedInBrowse: Boolean get() = parentFragment is androidx.leanback.app.BrowseSupportFragment
     private var menuShown: Boolean = true
 
     override fun onMenuVisibilityChanged(menuShown: Boolean) {
         this.menuShown = menuShown
         if (!usePhotoTiles) return
-        photoGridLayout?.menuShown = menuShown
+        photoGridLayout?.menuShown = menuShown && menuPushesContent
         view?.let { layoutPhotoHeader(it) }
     }
 
@@ -374,7 +382,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         val title = root.findViewById<TextView>(R.id.grid_title) ?: return
         val standalone = !hostedInBrowse
         val compact = !menuShown && !standalone
-        val hidden = if (menuShown && !standalone) UiStyleProvider.dp(context, tokens.sidebarWidthDp) else 0
+        val hidden = if (menuShown && !standalone && menuPushesContent) UiStyleProvider.dp(context, tokens.sidebarWidthDp) else 0
         // standalone (month view, mockup apple-07): 48px top, 64px title, 30px below
         val top = if (standalone) 24 else if (compact) tokens.contentPaddingTopCompactDp else tokens.contentPaddingTopDp
         val gap = if (compact) tokens.headerGapCompactDp else tokens.headerGapDp
@@ -431,12 +439,26 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
 
         UiStyleProvider.applyBody(pill, tokens, tokens.bodySizeSp, tokens.dim)
         pill.background = UiStyleProvider.pillBackground(context, tokens)
-        pill.setPadding(
-            UiStyleProvider.dp(context, 12),
-            UiStyleProvider.dp(context, 6),
-            UiStyleProvider.dp(context, 12),
-            UiStyleProvider.dp(context, 6)
-        )
+        if (tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.GOOGLE_TV) {
+            // mockup: 60px tall, 26px side padding, a small accent dot before the date
+            pill.minHeight = UiStyleProvider.dp(context, 30)
+            pill.gravity = android.view.Gravity.CENTER_VERTICAL
+            pill.setPadding(UiStyleProvider.dp(context, 13), 0, UiStyleProvider.dp(context, 13), 0)
+            val dot = android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.OVAL
+                setColor(tokens.accent)
+                setSize(UiStyleProvider.dp(context, 4), UiStyleProvider.dp(context, 4))
+            }
+            pill.setCompoundDrawablesRelativeWithIntrinsicBounds(dot, null, null, null)
+            pill.compoundDrawablePadding = UiStyleProvider.dp(context, 7)
+        } else {
+            pill.setPadding(
+                UiStyleProvider.dp(context, 12),
+                UiStyleProvider.dp(context, 6),
+                UiStyleProvider.dp(context, 12),
+                UiStyleProvider.dp(context, 6)
+            )
+        }
         datePill = pill
     }
 
@@ -482,9 +504,15 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         val dateText = format.format(date)
         val text = SpannableStringBuilder(dateText)
         text.setSpan(ForegroundColorSpan(tokens.text), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        if (!city.isNullOrBlank()) {
-            text.append("  \u00B7  ").append(city)
+        if (tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.GOOGLE_TV) {
+            // medium weight date, then the dim place after an en space (no separator dot)
+            text.setSpan(MediumSpan(UiStyleProvider.titleTypeface(tokens)), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (!city.isNullOrBlank()) text.append("\u2003").append(city)
+        } else {
+            text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (!city.isNullOrBlank()) {
+                text.append("  \u00B7  ").append(city)
+            }
         }
         pill.text = text
         pill.visibility = View.VISIBLE

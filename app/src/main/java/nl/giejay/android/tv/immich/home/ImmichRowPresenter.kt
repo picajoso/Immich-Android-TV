@@ -3,6 +3,7 @@ package nl.giejay.android.tv.immich.home
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
 import nl.giejay.android.tv.immich.R
@@ -26,15 +27,33 @@ class ImmichRowPresenter : Presenter() {
 
         val viewHolder = ImmichRowViewHolder(root)
         root.background = UiStyleProvider.sidebarRowBackground(context, tokens)
-        val padH = UiStyleProvider.dp(context, 10)
-        val padV = UiStyleProvider.dp(context, 7)
-        root.setPadding(padH, padV, padH, padV)
-        // full width highlight: Leanback wraps header views in a wrap_content frame
-        root.minimumWidth = UiStyleProvider.dp(context, tokens.sidebarWidthDp - 2 * SectionHeaderPresenter.SIDEBAR_PAD_H_DP)
+        if (tokens.style == UiStyle.GOOGLE_TV) {
+            // mockup: 62px tall rows, 26px side padding, the focused one is a pill that hugs its content
+            val padH = UiStyleProvider.dp(context, 13)
+            root.setPadding(padH, 0, padH, 0)
+            root.layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, UiStyleProvider.dp(context, 31))
+            root.minimumHeight = UiStyleProvider.dp(context, 31)
+            (root as? LinearLayout)?.gravity = android.view.Gravity.CENTER_VERTICAL
+            viewHolder.navIcon.layoutParams = (viewHolder.navIcon.layoutParams as ViewGroup.MarginLayoutParams).apply {
+                width = UiStyleProvider.dp(context, 15)
+                height = UiStyleProvider.dp(context, 15)
+                marginEnd = UiStyleProvider.dp(context, 11)
+            }
+            viewHolder.tvTitle.layoutParams = (viewHolder.tvTitle.layoutParams as LinearLayout.LayoutParams).apply {
+                width = ViewGroup.LayoutParams.WRAP_CONTENT
+                weight = 0f
+            }
+        } else {
+            val padH = UiStyleProvider.dp(context, 10)
+            val padV = UiStyleProvider.dp(context, 7)
+            root.setPadding(padH, padV, padH, padV)
+            // full width highlight: Leanback wraps header views in a wrap_content frame
+            root.minimumWidth = UiStyleProvider.dp(context, tokens.sidebarWidthDp - 2 * SectionHeaderPresenter.SIDEBAR_PAD_H_DP)
+        }
 
         viewHolder.tvTitle.setTextColor(UiStyleProvider.sidebarRowTextColors(tokens))
         viewHolder.tvTitle.typeface = UiStyleProvider.bodyTypeface(tokens)
-        viewHolder.tvTitle.textSize = tokens.bodySizeSp
+        viewHolder.tvTitle.textSize = if (tokens.style == UiStyle.GOOGLE_TV) 13.5f else tokens.bodySizeSp
         updateIconTint(viewHolder, tokens.style, false)
         viewHolder.count.typeface = UiStyleProvider.bodyTypeface(tokens)
         viewHolder.count.setTextColor(tokens.dim)
@@ -50,19 +69,25 @@ class ImmichRowPresenter : Presenter() {
 
     private fun updateIconTint(vh: ImmichRowViewHolder, style: UiStyle, focused: Boolean) {
         val tokens = UiStyleProvider.tokens(style)
-        val color = when (style) {
+        if (style == UiStyle.GOOGLE_TV) {
+            // icons follow the label: dark while the pill is filled (focused / selected row)
+            vh.navIcon.setColorFilter(if (focused || vh.root.isSelected) tokens.selectedRowText else tokens.text)
+        } else {
             // Apple: icons keep the accent color
-            UiStyle.APPLE -> tokens.accent
-            // Google TV: icons follow the label (inverted while the pill is filled)
-            UiStyle.GOOGLE_TV -> if (focused) tokens.selectedRowText else tokens.text
+            vh.navIcon.setColorFilter(tokens.accent)
         }
-        vh.navIcon.setColorFilter(color)
         vh.icon.setColorFilter(tokens.dim)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         val headerItem = if (item == null) null else (item as Row).headerItem
         val vh = viewHolder as ImmichRowViewHolder
+        if (UiStyleProvider.current().style == UiStyle.GOOGLE_TV && vh.tag == null) {
+            vh.tag = true
+            vh.root.viewTreeObserver.addOnGlobalLayoutListener {
+                updateIconTint(vh, UiStyle.GOOGLE_TV, vh.tvTitle.isFocused)
+            }
+        }
         vh.tvTitle.text = headerItem?.name
 
         val count = headerItem?.name?.let { counts[it] }
@@ -99,6 +124,9 @@ class ImmichRowPresenter : Presenter() {
     }
 
     companion object {
+        /** Name of the signed-in user, shown in the Google TV drawer. */
+        var userName: String? = null
+
         /** Counter shown at the right of a menu entry, by entry name (e.g. "Photos" -> "4.812"). */
         val counts: MutableMap<String, String> = mutableMapOf()
 

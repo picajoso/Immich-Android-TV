@@ -339,4 +339,10 @@
     <style name="ProgressBar" parent="AppTheme">
         <item name="colorAccent">@color/progressbarColor</item>
     </style>
+
+    <!-- Applied on top of AppTheme in the Google TV style: the drawer overlays the content instead
+         of pushing it aside (see MainActivity.onApplyThemeResource) -->
+    <style name="UiOverlayGoogleTv">
+        <item name="browseRowsMarginStart">0dp</item>
+    </style>
 </resources>
