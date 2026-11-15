@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from the Tr.t("...") texts of the code; see shared/util/Tr.kt -->
+<resources>
+    <string name="t_1_year_ago" formatted="false">1 year ago</string>
+    <string name="t_add_a_name" formatted="false">Add a name</string>
+    <string name="t_address" formatted="false">Address</string>
+    <string name="t_albums" formatted="false">Albums</string>
+    <string name="t_align" formatted="false">Align</string>
+    <string name="t_alignment_of_metadata" formatted="false">Alignment of metadata</string>
+    <string name="t_all" formatted="false">All</string>
+    <string name="t_alphabetically_a_z" formatted="false">Alphabetically (A-Z)</string>
+    <string name="t_alphabetically_z_a" formatted="false">Alphabetically (Z-A)</string>
+    <string name="t_api_key" formatted="false">API Key</string>
+    <string name="t_appearance" formatted="false">Appearance</string>
+    <string name="t_apple" formatted="false">Apple</string>
+    <string name="t_asset_count" formatted="false">Asset count</string>
+    <string name="t_assets_outside_albums" formatted="false">Assets outside albums</string>
+    <string name="t_change_server" formatted="false">Change server</string>
+    <string name="t_choose_what_appears_in_the_side_menu_ok_turns_a_section_on_o" formatted="false">Choose what appears in the side menu.\nOK turns a section on or off.</string>
+    <string name="t_close" formatted="false">Close</string>
+    <string name="t_collections" formatted="false">Collections</string>
+    <string name="t_columns" formatted="false">Columns</string>
+    <string name="t_configure_what_to_show_in_screensaver" formatted="false">Configure what to show in screensaver</string>
+    <string name="t_configure_what_to_show_in_the_different_views" formatted="false">Configure what to show in the different views</string>
+    <string name="t_configure_what_to_show_in_viewer" formatted="false">Configure what to show in viewer</string>
+    <string name="t_configured" formatted="false">Configured</string>
+    <string name="t_connection_to_your_immich_server" formatted="false">Connection to your Immich server</string>
+    <string name="t_content_type" formatted="false">Content type</string>
+    <string name="t_continue" formatted="false">Continue</string>
+    <string name="t_continuous_navigation_enabled" formatted="false">Continuous navigation enabled</string>
+    <string name="t_could_not_finalize_donation_due_to_error_please_contact_the_" formatted="false">Could not finalize donation due to error, please contact the developer.</string>
+    <string name="t_could_not_initialize_donation_service_sorry" formatted="false">Could not initialize donation service, sorry!</string>
+    <string name="t_could_not_load_assets_from_immich" formatted="false">Could not load assets from Immich</string>
+    <string name="t_could_not_open_the_screensaver_settings_on_this_device_you_c" formatted="false">Could not open the screensaver settings on this device. You can use the following steps to enable the screensaver:\n\n\n1. Enable development mode on the device (click the build number or \'Android TV OS Build\' 7 times in the System->About settings).\n\n2. Go to System -> Developer Options and enable USB Debugging\n\n3. If you don\'t have ADB installed on your PC, follow these instructions: https://www.xda-developers.com/install-adb-windows-macos-linux/\n4. After downloading/installing ADB on the PC, connect to the device using it\'s IP: \'adb connect 192.168.xx.xx\'.\n\n5. Once you are connected, execute the following command: \'adb shell settings put secure screensaver_components nl.giejay.android.tv.immich/.screensaver.ScreenSaverService\'\n\n6. Done!.\n\nYou can also check the instructions on the GitHub page: https://github.com/giejay/Immich-Android-TV</string>
+    <string name="t_could_not_start_screensaver_for_immich_because_of_invalid_ho" formatted="false">Could not start screensaver for Immich because of invalid Hostname/API key</string>
+    <string name="t_customize_metadata" formatted="false">Customize metadata</string>
+    <string name="t_customize_screensaver_metadata" formatted="false">Customize screensaver metadata</string>
+    <string name="t_customize_view" formatted="false">Customize view</string>
+    <string name="t_d_people" formatted="false">%d people</string>
+    <string name="t_d_person" formatted="false">%d person</string>
+    <string name="t_d_photo" formatted="false">%d photo</string>
+    <string name="t_d_photos" formatted="false">%d photos</string>
+    <string name="t_d_years_ago" formatted="false">%d years ago</string>
+    <string name="t_debug" formatted="false">Debug</string>
+    <string name="t_debug_mode" formatted="false">Debug mode</string>
+    <string name="t_debug_settings" formatted="false">Debug Settings</string>
+    <string name="t_delete_item" formatted="false">Delete item</string>
+    <string name="t_demo_mode" formatted="false">Demo mode</string>
+    <string name="t_developing_this_app_takes_a_lot_of_effort_if_you_would_like_" formatted="false">Developing this app takes a lot of effort, if you would like to show your appreciation, you can donate using the following options.</string>
+    <string name="t_did_not_authenticate_within_the_timeout_recreating_qr_code" formatted="false">Did not authenticate within the timeout, recreating QR code.</string>
+    <string name="t_disable_ssl_verification" formatted="false">Disable SSL verification</string>
+    <string name="t_donate" formatted="false">Donate</string>
+    <string name="t_donation" formatted="false">Donation</string>
+    <string name="t_done" formatted="false">Done</string>
+    <string name="t_edit" formatted="false">Edit</string>
+    <string name="t_edit_menu" formatted="false">Edit menu</string>
+    <string name="t_edit_metadata" formatted="false">Edit metadata</string>
+    <string name="t_enable_debug_mode" formatted="false">Enable debug mode</string>
+    <string name="t_enable_this_if_you_are_experiencing_issues" formatted="false">Enable this if you are experiencing issues.</string>
+    <string name="t_enable_this_if_you_are_experiencing_issues_with_getting_the_" formatted="false">Enable this if you are experiencing issues with getting the Immich data.</string>
+    <string name="t_error_navigating_to_the_viewer" formatted="false">Error navigating to the viewer</string>
+    <string name="t_exclude_assets_in_specific_albums_for_random_seasonal_view" formatted="false">Exclude assets in specific albums for random/seasonal view</string>
+    <string name="t_excluded_albums" formatted="false">Excluded albums</string>
+    <string name="t_favorites" formatted="false">Favorites</string>
+    <string name="t_filter_by_content_type" formatted="false">Filter by content type</string>
+    <string name="t_filtering" formatted="false">Filtering</string>
+    <string name="t_folders" formatted="false">Folders</string>
+    <string name="t_font_size" formatted="false">Font size</string>
+    <string name="t_google_tv" formatted="false">Google TV</string>
+    <string name="t_hostname" formatted="false">Hostname</string>
+    <string name="t_how_many_years_to_go_back_when_selecting_seasonal_photos" formatted="false">How many years to go back when selecting seasonal photos</string>
+    <string name="t_image" formatted="false">Image</string>
+    <string name="t_include_videos" formatted="false">Include videos</string>
+    <string name="t_include_videos_in_screensaver" formatted="false">Include videos in screensaver</string>
+    <string name="t_interface_style" formatted="false">Interface style</string>
+    <string name="t_interface_style_grid_thumbnails" formatted="false">Interface style, grid, thumbnails</string>
+    <string name="t_interval" formatted="false">Interval</string>
+    <string name="t_interval_of_the_screensaver" formatted="false">Interval of the screensaver</string>
+    <string name="t_interval_of_the_slideshow" formatted="false">Interval of the slideshow</string>
+    <string name="t_invalid_immich_server_settings_redirecting_to_login_screen" formatted="false">Invalid Immich server settings, redirecting to login screen.</string>
+    <string name="t_invalid_server_url_or_api_key_try_scanning_again" formatted="false">Invalid Server URL or API key, try scanning again!</string>
+    <string name="t_last_updated" formatted="false">Last updated</string>
+    <string name="t_latest_album" formatted="false">Latest album</string>
+    <string name="t_least_updated" formatted="false">Least updated</string>
+    <string name="t_library" formatted="false">Library</string>
+    <string name="t_load_selected_item_as_background" formatted="false">Load selected item as background</string>
+    <string name="t_load_the_currently_selected_image_album_as_the_background" formatted="false">Load the currently selected image/album as the background</string>
+    <string name="t_login_to_a_demo_immich_instance" formatted="false">Login to a demo Immich instance.</string>
+    <string name="t_login_to_your_immich_instance_by_entering_your_api_key" formatted="false">Login to your Immich instance by entering your API key.</string>
+    <string name="t_login_to_your_immich_instance_by_phone" formatted="false">Login to your Immich instance by phone.</string>
+    <string name="t_login_to_your_immich_server_or_try_a_demo" formatted="false">Login to your Immich server or try a demo.</string>
+    <string name="t_logs_and_diagnostics" formatted="false">Logs and diagnostics</string>
+    <string name="t_look_of_the_app_apple_or_google_tv" formatted="false">Look of the app: Apple or Google TV</string>
+    <string name="t_maximum_percentage_to_cut_off_image_height_if_using_safecent" formatted="false">Maximum percentage to cut off image height if using SafeCenterCrop</string>
+    <string name="t_maximum_percentage_to_cut_off_image_width_if_using_safecente" formatted="false">Maximum percentage to cut off image width if using SafeCenterCrop</string>
+    <string name="t_merge_portrait_photos" formatted="false">Merge portrait photos</string>
+    <string name="t_metadata" formatted="false">Metadata</string>
+    <string name="t_my_albums" formatted="false">My Albums</string>
+    <string name="t_newest_oldest" formatted="false">Newest - Oldest</string>
+    <string name="t_no_assets_to_show_for_screensaver_please_configure_a_differe" formatted="false">No assets to show for screensaver. Please configure a different screensaver type in the settings.</string>
+    <string name="t_no_items_to_play" formatted="false">No items to play</string>
+    <string name="t_no_photos_found" formatted="false">No photos found</string>
+    <string name="t_no_photos_from_this_day_in_previous_years" formatted="false">No photos from this day in previous years</string>
+    <string name="t_no_photos_yet" formatted="false">No photos yet</string>
+    <string name="t_not_possible_to_set_screensaver" formatted="false">Not possible to set screensaver</string>
+    <string name="t_not_set" formatted="false">Not set</string>
+    <string name="t_not_signed_in" formatted="false">Not signed in</string>
+    <string name="t_number_of_grid_columns" formatted="false">Number of grid columns</string>
+    <string name="t_off" formatted="false">Off</string>
+    <string name="t_oldest_newest" formatted="false">Oldest - Newest</string>
+    <string name="t_on" formatted="false">On</string>
+    <string name="t_on_this_day" formatted="false">On this day</string>
+    <string name="t_only_use_this_when_you_have_issues_with_self_signed_certific" formatted="false">Only use this when you have issues with self signed certificates!</string>
+    <string name="t_open" formatted="false">Open</string>
+    <string name="t_open_debug_settings" formatted="false">Open debug settings</string>
+    <string name="t_open_screensaver_settings" formatted="false">Open screensaver settings</string>
+    <string name="t_open_view_settings" formatted="false">Open view settings</string>
+    <string name="t_options" formatted="false">Options</string>
+    <string name="t_or_enter_the_code_on_https_immich_giejay_nl" formatted="false">Or enter the code on https://immich.giejay.nl</string>
+    <string name="t_order" formatted="false">Order</string>
+    <string name="t_order_of_metadata" formatted="false">Order of metadata</string>
+    <string name="t_ordering" formatted="false">Ordering</string>
+    <string name="t_other" formatted="false">Other</string>
+    <string name="t_padding" formatted="false">Padding</string>
+    <string name="t_padding_above_and_below_the_item" formatted="false">Padding above and below the item</string>
+    <string name="t_people" formatted="false">People</string>
+    <string name="t_photo_transformation" formatted="false">Photo transformation</string>
+    <string name="t_photos" formatted="false">Photos</string>
+    <string name="t_photos_in_albums" formatted="false">Photos in albums</string>
+    <string name="t_play_sound" formatted="false">Play sound</string>
+    <string name="t_play_sound_of_videos_during_screensaver" formatted="false">Play sound of videos during screensaver</string>
+    <string name="t_please_enter_a_server_url_https" formatted="false">Please enter a server URL (https://...)</string>
+    <string name="t_please_enter_a_valid_server_url_https" formatted="false">Please enter a valid server URL (https://...)</string>
+    <string name="t_please_enter_an_api_key_if_you_did_enter_it_try_to_highlight" formatted="false">Please enter an API key, if you did enter it, try to highlight it again and press enter/OK, not back (sorry).</string>
+    <string name="t_please_set_your_albums_to_show_first" formatted="false">Please set your albums to show first!</string>
+    <string name="t_random" formatted="false">Random</string>
+    <string name="t_recent" formatted="false">Recent</string>
+    <string name="t_recent_photos_months_back" formatted="false">Recent photos months back</string>
+    <string name="t_recently_added" formatted="false">Recently added</string>
+    <string name="t_recently_taken" formatted="false">Recently taken</string>
+    <string name="t_reset_to_default" formatted="false">Reset to default</string>
+    <string name="t_safe_center_crop_max_cutoff_height" formatted="false">Safe Center Crop max cutoff height %</string>
+    <string name="t_safe_center_crop_max_cutoff_width" formatted="false">Safe Center Crop max cutoff width %</string>
+    <string name="t_save_item" formatted="false">Save item</string>
+    <string name="t_scan_the_qr_code_below" formatted="false">Scan the QR code below</string>
+    <string name="t_screensaver" formatted="false">Screensaver</string>
+    <string name="t_screensaver_options" formatted="false">Screensaver options</string>
+    <string name="t_screensaver_settings" formatted="false">Screensaver Settings</string>
+    <string name="t_screensaver_type" formatted="false">Screensaver type</string>
+    <string name="t_seasonal" formatted="false">Seasonal</string>
+    <string name="t_seasonal_photos_period_in_days" formatted="false">Seasonal photos period in days</string>
+    <string name="t_seasonal_photos_years_back" formatted="false">Seasonal photos years back</string>
+    <string name="t_server" formatted="false">Server</string>
+    <string name="t_server_url" formatted="false">Server URL</string>
+    <string name="t_server_url_http_s" formatted="false">Server URL (http[s]://...)</string>
+    <string name="t_set_albums_to_show_in_screensaver" formatted="false">Set albums to show in screensaver</string>
+    <string name="t_set_immich_as_screensaver" formatted="false">Set Immich as screensaver</string>
+    <string name="t_set_the_immich_albums_to_show_in_the_screensaver_settings" formatted="false">Set the Immich albums to show in the screensaver settings</string>
+    <string name="t_set_the_order_in_which_albums_should_appear" formatted="false">Set the order in which albums should appear</string>
+    <string name="t_set_the_order_in_which_assets_should_appear_outside_albums" formatted="false">Set the order in which assets should appear outside Albums</string>
+    <string name="t_set_the_order_in_which_photos_should_appear" formatted="false">Set the order in which photos should appear</string>
+    <string name="t_set_the_order_in_which_photos_should_appear_inside_albums" formatted="false">Set the order in which photos should appear inside albums</string>
+    <string name="t_settings" formatted="false">Settings</string>
+    <string name="t_shared_albums" formatted="false">Shared Albums</string>
+    <string name="t_show_album_name" formatted="false">Show album name</string>
+    <string name="t_show_album_name_of_asset_in_screensaver" formatted="false">Show album name of asset in screensaver</string>
+    <string name="t_show_city" formatted="false">Show city</string>
+    <string name="t_show_city_of_asset_in_slideshow" formatted="false">Show city of asset in slideshow</string>
+    <string name="t_show_clock" formatted="false">Show clock</string>
+    <string name="t_show_clock_in_screensaver" formatted="false">Show clock in screensaver</string>
+    <string name="t_show_date" formatted="false">Show date</string>
+    <string name="t_show_date_of_asset_in_screensaver" formatted="false">Show date of asset in screensaver</string>
+    <string name="t_show_date_of_asset_in_slideshow" formatted="false">Show date of asset in slideshow</string>
+    <string name="t_show_description" formatted="false">Show description</string>
+    <string name="t_show_description_of_asset_in_screensaver" formatted="false">Show description of asset in screensaver</string>
+    <string name="t_show_description_of_asset_in_slideshow" formatted="false">Show description of asset in slideshow</string>
+    <string name="t_show_file_names_in_grid" formatted="false">Show file names in grid</string>
+    <string name="t_show_media_count" formatted="false">Show media count</string>
+    <string name="t_show_only_videos" formatted="false">Show only videos</string>
+    <string name="t_show_the_file_name_below_photos_in_the_grid_view" formatted="false">Show the file name below photos in the grid view</string>
+    <string name="t_show_the_number_of_total_items_and_currently_selected_item" formatted="false">Show the number of total items and currently selected item</string>
+    <string name="t_show_two_portrait_photos_next_to_each_other" formatted="false">Show two portrait photos next to each other</string>
+    <string name="t_shuffle" formatted="false">Shuffle</string>
+    <string name="t_sign_in_by_api_key" formatted="false">Sign in by API key</string>
+    <string name="t_sign_in_by_phone" formatted="false">Sign in by phone</string>
+    <string name="t_slide_animation_speed_in_milliseconds" formatted="false">Slide animation speed in milliseconds</string>
+    <string name="t_slide_animation_speed_ms" formatted="false">Slide animation speed (ms)</string>
+    <string name="t_slide_the_new_asset_in" formatted="false">Slide the new asset in</string>
+    <string name="t_slide_the_new_asset_in_when_transitioning" formatted="false">Slide the new asset in when transitioning</string>
+    <string name="t_slideshow" formatted="false">Slideshow</string>
+    <string name="t_source_interval_metadata" formatted="false">Source, interval, metadata</string>
+    <string name="t_status" formatted="false">Status</string>
+    <string name="t_submit" formatted="false">Submit</string>
+    <string name="t_support_the_project" formatted="false">Support the project</string>
+    <string name="t_thanks" formatted="false">Thanks</string>
+    <string name="t_thanks_for_your_donation_highly_appreciated" formatted="false">Thanks for your donation, highly appreciated!</string>
+    <string name="t_this_app_is_free_and_open_source" formatted="false">This app is free and open source</string>
+    <string name="t_this_year" formatted="false">This year</string>
+    <string name="t_timeline" formatted="false">Timeline</string>
+    <string name="t_timeline_photo" formatted="false">Timeline photo</string>
+    <string name="t_type" formatted="false">Type</string>
+    <string name="t_type_of_metadata" formatted="false">Type of metadata</string>
+    <string name="t_unknown" formatted="false">Unknown</string>
+    <string name="t_use_high_resolution_thumbnails" formatted="false">Use high resolution thumbnails</string>
+    <string name="t_use_high_resolution_thumbnails_instead_of_native_full_images" formatted="false">Use high resolution thumbnails instead of native/full images. Will dramatically speed up loading.</string>
+    <string name="t_user_id" formatted="false">User ID</string>
+    <string name="t_video" formatted="false">Video</string>
+    <string name="t_view_settings" formatted="false">View settings</string>
+    <string name="t_what_to_show_albums_random_recent_etc" formatted="false">What to show: albums, random, recent etc.</string>
+    <string name="t_when_enabled_all_sections_will_only_show_videos" formatted="false">When enabled, all sections will only show videos</string>
+    <string name="t_you_already_added_every_possible_meta_data" formatted="false">You already added every possible meta data</string>
+    <string name="t_you_have_exhausted_your_donate_options_thanks" formatted="false">You have exhausted your donate options, thanks!</string>
+    <string name="t_your_donation_could_not_be_completed" formatted="false">Your donation could not be completed</string>
+    <string name="t_your_user_id_needed_for_debugging" formatted="false">Your user id, needed for debugging</string>
+</resources>

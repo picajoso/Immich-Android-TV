@@ -50,7 +50,7 @@ class EditMenuFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterPr
         root.setPadding(padH, UiStyleProvider.dp(ctx, tokens.contentPaddingTopDp), padH, 0)
 
         val title = TextView(ctx)
-        title.text = "Edit menu"
+        title.text = nl.giejay.android.tv.immich.shared.util.Tr.t("Edit menu")
         UiStyleProvider.applyTitle(title, tokens)
         root.addView(title)
 
@@ -72,9 +72,9 @@ class EditMenuFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterPr
         side.setPadding(UiStyleProvider.dp(ctx, 40), UiStyleProvider.dp(ctx, 14), 0, 0)
         val help = TextView(ctx)
         UiStyleProvider.applyBody(help, tokens, 14f, tokens.dim)
-        help.text = "Choose what appears in the side menu.\nOK turns a section on or off."
+        help.text = nl.giejay.android.tv.immich.shared.util.Tr.t("Choose what appears in the side menu.\nOK turns a section on or off.")
         side.addView(help)
-        val reset = PageKit.pill(ctx, tokens, "Reset to default", selected = false, focusable = true) {
+        val reset = PageKit.pill(ctx, tokens, nl.giejay.android.tv.immich.shared.util.Tr.t("Reset to default"), selected = false, focusable = true) {
             PreferenceManager.save(HIDDEN_HOME_ITEMS, emptySet<String>())
             MenuState.dirty = true
             grid.adapter?.notifyDataSetChanged()
@@ -133,7 +133,7 @@ private class EditRowPresenter(private val tokens: UiTokens) : Presenter() {
         val name = parts[1] as TextView
         val toggle = parts[2] as ToggleSwitchView
 
-        name.text = entry
+        name.text = nl.giejay.android.tv.immich.shared.util.Tr.t(entry)
         val iconRes = ImmichRowPresenter.ICONS[entry]
         if (iconRes != null) icon.setImageResource(iconRes) else icon.setImageDrawable(null)
         toggle.checked = !PreferenceManager.itemInStringSet(entry, HIDDEN_HOME_ITEMS)

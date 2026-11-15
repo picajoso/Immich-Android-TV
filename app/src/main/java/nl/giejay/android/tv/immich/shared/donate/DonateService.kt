@@ -73,7 +73,7 @@ class DonateService(private val context: Context) : PurchasesUpdatedListener {
             .build()
         mBillingClient.consumeAsync(params) { _, _ ->
             showToast(
-                "Thanks for your donation, highly appreciated!",
+                nl.giejay.android.tv.immich.shared.util.Tr.t("Thanks for your donation, highly appreciated!"),
                 Toast.LENGTH_LONG
             )
         }
@@ -109,21 +109,21 @@ class DonateService(private val context: Context) : PurchasesUpdatedListener {
                         consumePurchase(purchase)
                     }
                 } else if (purchase.purchaseState == Purchase.PurchaseState.PENDING) {
-                    showToast("Thanks for your donation, highly appreciated!", Toast.LENGTH_LONG)
+                    showToast(nl.giejay.android.tv.immich.shared.util.Tr.t("Thanks for your donation, highly appreciated!"), Toast.LENGTH_LONG)
                 } else if (purchase.purchaseState == Purchase.PurchaseState.UNSPECIFIED_STATE) {
-                    showToast("Your donation could not be completed", Toast.LENGTH_SHORT)
+                    showToast(nl.giejay.android.tv.immich.shared.util.Tr.t("Your donation could not be completed"), Toast.LENGTH_SHORT)
                 }
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
 //            showToast("Donation cancelled", Toast.LENGTH_SHORT)
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.BILLING_UNAVAILABLE) {
             showToast(
-                "Could not finalize donation due to error, please contact the developer.",
+                nl.giejay.android.tv.immich.shared.util.Tr.t("Could not finalize donation due to error, please contact the developer."),
                 Toast.LENGTH_SHORT
             )
         } else {
             showToast(
-                "Could not finalize donation due to error, please contact the developer.",
+                nl.giejay.android.tv.immich.shared.util.Tr.t("Could not finalize donation due to error, please contact the developer."),
                 Toast.LENGTH_SHORT
             )
         }

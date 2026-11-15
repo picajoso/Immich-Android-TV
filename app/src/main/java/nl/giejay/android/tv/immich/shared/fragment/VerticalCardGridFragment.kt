@@ -138,7 +138,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         } else {
             Toast.makeText(
                 ImmichApplication.appContext,
-                "Invalid Immich server settings, redirecting to login screen.",
+                nl.giejay.android.tv.immich.shared.util.Tr.t("Invalid Immich server settings, redirecting to login screen."),
                 Toast.LENGTH_SHORT
             ).show()
             findNavController().navigate(HomeFragmentDirections.actionGlobalSignInFragment())

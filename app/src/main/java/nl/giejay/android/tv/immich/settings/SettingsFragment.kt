@@ -64,7 +64,7 @@ class SettingsFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterPr
         root.setPadding(padH, UiStyleProvider.dp(ctx, tokens.contentPaddingTopDp), padH, UiStyleProvider.dp(ctx, 24))
 
         val title = TextView(ctx)
-        title.text = "Settings"
+        title.text = nl.giejay.android.tv.immich.shared.util.Tr.t("Settings")
         UiStyleProvider.applyTitle(title, tokens)
         root.addView(title)
 
@@ -132,42 +132,42 @@ class SettingsFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterPr
 
     private fun buildItems(): List<NewSettingsItem> = listOf(
         NewSettingsItem(
-            "Server", "Connection to your Immich server", "ic_settings_settings",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Server"), nl.giejay.android.tv.immich.shared.util.Tr.t("Connection to your Immich server"), "ic_settings_settings",
             {
                 val host = PreferenceManager.get(HOST_NAME)
                 listOf(
-                    "Address" to (if (host.isNotBlank()) host else "Not set"),
-                    "Status" to (if (PreferenceManager.isLoggedId()) "Configured" else "Not signed in")
+                    nl.giejay.android.tv.immich.shared.util.Tr.t("Address") to (if (host.isNotBlank()) host else nl.giejay.android.tv.immich.shared.util.Tr.t("Not set")),
+                    nl.giejay.android.tv.immich.shared.util.Tr.t("Status") to (if (PreferenceManager.isLoggedId()) nl.giejay.android.tv.immich.shared.util.Tr.t("Configured") else nl.giejay.android.tv.immich.shared.util.Tr.t("Not signed in"))
                 )
             },
-            "Change server"
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Change server")
         ) { findNavController().navigate(HomeFragmentDirections.actionGlobalSignInFragment()) },
         NewSettingsItem(
-            "View settings", "Interface style, grid, thumbnails", "icon_view",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("View settings"), nl.giejay.android.tv.immich.shared.util.Tr.t("Interface style, grid, thumbnails"), "icon_view",
             {
                 listOf(
-                    "Interface style" to (when (UiStyleProvider.currentStyle()) {
-                        UiStyle.APPLE -> "Apple"
-                        UiStyle.GOOGLE_TV -> "Google TV"
+                    nl.giejay.android.tv.immich.shared.util.Tr.t("Interface style") to (when (UiStyleProvider.currentStyle()) {
+                        UiStyle.APPLE -> nl.giejay.android.tv.immich.shared.util.Tr.t("Apple")
+                        UiStyle.GOOGLE_TV -> nl.giejay.android.tv.immich.shared.util.Tr.t("Google TV")
                     })
                 )
             },
-            "Open view settings"
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Open view settings")
         ) { findNavController().navigate(HomeFragmentDirections.actionGlobalToSettingsDialog(ViewPrefScreen.key)) },
         NewSettingsItem(
-            "Screensaver", "Screensaver options", "screensaver",
-            { listOf("Options" to "Source, interval, metadata") },
-            "Open screensaver settings"
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Screensaver"), nl.giejay.android.tv.immich.shared.util.Tr.t("Screensaver options"), "screensaver",
+            { listOf(nl.giejay.android.tv.immich.shared.util.Tr.t("Options") to nl.giejay.android.tv.immich.shared.util.Tr.t("Source, interval, metadata")) },
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Open screensaver settings")
         ) { findNavController().navigate(HomeFragmentDirections.actionGlobalToSettingsDialog(ScreensaverPrefScreen.key)) },
         NewSettingsItem(
-            "Debug", "Logs and diagnostics", "bug",
-            { listOf("Debug mode" to (if (PreferenceManager.get(DEBUG_MODE)) "On" else "Off")) },
-            "Open debug settings"
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Debug"), nl.giejay.android.tv.immich.shared.util.Tr.t("Logs and diagnostics"), "bug",
+            { listOf(nl.giejay.android.tv.immich.shared.util.Tr.t("Debug mode") to (if (PreferenceManager.get(DEBUG_MODE)) nl.giejay.android.tv.immich.shared.util.Tr.t("On") else nl.giejay.android.tv.immich.shared.util.Tr.t("Off"))) },
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Open debug settings")
         ) { findNavController().navigate(HomeFragmentDirections.actionGlobalToSettingsDialog(DebugPrefScreen.key)) },
         NewSettingsItem(
-            "Donate", "Support the project", "donate",
-            { listOf("Thanks" to "This app is free and open source") },
-            "Open"
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Donate"), nl.giejay.android.tv.immich.shared.util.Tr.t("Support the project"), "donate",
+            { listOf(nl.giejay.android.tv.immich.shared.util.Tr.t("Thanks") to nl.giejay.android.tv.immich.shared.util.Tr.t("This app is free and open source")) },
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Open")
         ) { findNavController().navigate(HomeFragmentDirections.actionHomeToDonate()) }
     )
 

@@ -40,7 +40,7 @@ class AuthFragmentStep2 : GuidedStepSupportFragment() {
         val icon: Drawable = requireContext().getDrawable(R.drawable.icon)!!
         return GuidanceStylist.Guidance(
             "Immich TV",
-            "Login to your Immich server or try a demo.",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Login to your Immich server or try a demo."),
             "",
             icon
         )
@@ -50,29 +50,29 @@ class AuthFragmentStep2 : GuidedStepSupportFragment() {
         addEditableAction(
             actions,
             ACTION_NAME,
-            "Server URL (http[s]://...)",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Server URL (http[s]://...)"),
             PreferenceManager.get(HOST_NAME),
             InputType.TYPE_CLASS_TEXT
         )
         addEditableAction(
             actions,
             ACTION_API_KEY,
-            "API Key",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("API Key"),
             PreferenceManager.get(API_KEY),
             InputType.TYPE_CLASS_TEXT
         )
         addCheckedAction(
             actions,
             ACTION_CHECK_CERTS,
-            "Disable SSL verification",
-            "Only use this when you have issues with self signed certificates!",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Disable SSL verification"),
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Only use this when you have issues with self signed certificates!"),
             PreferenceManager.get(DISABLE_SSL_VERIFICATION)
         )
         addCheckedAction(
             actions,
             ACTION_DEBUG_MODE,
-            "Debug mode",
-            "Enable this if you are experiencing issues with getting the Immich data.",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Debug mode"),
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Enable this if you are experiencing issues with getting the Immich data."),
             PreferenceManager.get(DEBUG_MODE)
         )
     }
@@ -82,7 +82,7 @@ class AuthFragmentStep2 : GuidedStepSupportFragment() {
         savedInstanceState: Bundle?
     ) {
         super.onCreateButtonActions(actions, savedInstanceState)
-        addAction(actions, ACTION_CONTINUE, "Submit", "")
+        addAction(actions, ACTION_CONTINUE, nl.giejay.android.tv.immich.shared.util.Tr.t("Submit"), "")
     }
 
     override fun onGuidedActionClicked(action: GuidedAction) {
@@ -99,16 +99,16 @@ class AuthFragmentStep2 : GuidedStepSupportFragment() {
                 val navControl = findNavController()
                 navControl.navigate(AuthFragmentStep2Directions.actionGlobalHomeFragment(), NavOptions.Builder().setPopUpTo(R.id.authFragment, true).build())
             } else if (entry.hostName.isEmpty()) {
-                Toast.makeText(activity, "Please enter a server URL (https://...)", Toast.LENGTH_SHORT)
+                Toast.makeText(activity, nl.giejay.android.tv.immich.shared.util.Tr.t("Please enter a server URL (https://...)"), Toast.LENGTH_SHORT)
                     .show()
             } else if (entry.apiKey.isEmpty()) {
                 Toast.makeText(
                     activity,
-                    "Please enter an API key, if you did enter it, try to highlight it again and press enter/OK, not back (sorry).",
+                    nl.giejay.android.tv.immich.shared.util.Tr.t("Please enter an API key, if you did enter it, try to highlight it again and press enter/OK, not back (sorry)."),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                Toast.makeText(activity, "Please enter a valid server URL (https://...)", Toast.LENGTH_SHORT)
+                Toast.makeText(activity, nl.giejay.android.tv.immich.shared.util.Tr.t("Please enter a valid server URL (https://...)"), Toast.LENGTH_SHORT)
                     .show()
             }
         }

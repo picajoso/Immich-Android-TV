@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="grid_columns_titles">
+        <item>3 columnas (grande)</item>
+        <item>4 columnas (estándar)</item>
+        <item>5 columnas (pequeño)</item>
+    </string-array>
+    <array name="interval_titles">
+        <item>1 segundo</item>
+        <item>3 segundos</item>
+        <item>5 segundos</item>
+        <item>10 segundos</item>
+        <item>20 segundos</item>
+        <item>30 segundos</item>
+        <item>1 minuto</item>
+        <item>3 minutos</item>
+        <item>5 minutos</item>
+        <item>10 minutos</item>
+    </array>
+    <array name="meta_data_alignment_labels">
+        <item>Izquierda</item>
+        <item>Derecha</item>
+    </array>
+    <string-array name="glide_transformation_labels">
+        <item>Centrar dentro (mantiene ancho/alto)</item>
+        <item>Recortar al centro (ajusta a la pantalla)</item>
+        <item>Recorte central seguro (porcentaje máximo)</item>
+    </string-array>
+    <string-array name="albums_order">
+        <item>Última actualización</item>
+        <item>Alfabético (A-Z)</item>
+        <item>Alfabético (Z-A)</item>
+        <item>Menos reciente</item>
+    </string-array>
+    <string-array name="photos_order">
+        <item>Más nuevas primero</item>
+        <item>Más antiguas primero</item>
+        <item>Alfabético (A-Z)</item>
+        <item>Alfabético (Z-A)</item>
+    </string-array>
+    <string-array name="content_type">
+        <item>Todo</item>
+        <item>Imagen</item>
+        <item>Vídeo</item>
+    </string-array>
+    <string-array name="all_assets_order">
+        <item>Más nuevas primero</item>
+        <item>Más antiguas primero</item>
+    </string-array>
+    <string-array name="screensaver_type_values">
+        <item>Álbumes</item>
+        <item>Aleatorio</item>
+        <item>Recientes</item>
+        <item>Por estación</item>
+    </string-array>
+</resources>

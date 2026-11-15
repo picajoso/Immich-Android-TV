@@ -130,7 +130,7 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
 
         val padH = dp(tokens.contentPaddingHDp)
         val title = TextView(ctx)
-        title.text = "Albums"
+        title.text = nl.giejay.android.tv.immich.shared.util.Tr.t("Albums")
         title.includeFontPadding = false
         UiStyleProvider.applyTitle(title, tokens)
         root.addView(title, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
@@ -248,13 +248,13 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
         if (!isAdded || shownHeroId == album.id) return
         shownHeroId = album.id
         // the label only makes sense for the latest album
-        heroLabel?.text = if (album.id == latestAlbumId) "Latest album" else ""
+        heroLabel?.text = if (album.id == latestAlbumId) nl.giejay.android.tv.immich.shared.util.Tr.t("Latest album") else ""
         heroName?.text = album.albumName
         val locale = Locale.getDefault(Locale.Category.FORMAT)
         val date = (album.endDate ?: album.updatedAt)?.let {
             SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, "MMMyyyy"), locale).format(it)
         }
-        heroMeta?.text = listOfNotNull(date, "${UiFormat.count(album.assetCount)} ${if (album.assetCount == 1) "photo" else "photos"}").joinToString(" · ")
+        heroMeta?.text = listOfNotNull(date, nl.giejay.android.tv.immich.shared.util.Tr.photos(album.assetCount)).joinToString(" · ")
         val url = ApiUtil.getThumbnailUrl(album.albumThumbnailAssetId, "preview")
         if (url != null) Glide.with(this).load(url).centerCrop().into(image) else image.setImageDrawable(null)
     }
@@ -323,7 +323,7 @@ private class GoogleAlbumCardPresenter(
         val album = item as? Album ?: return
         val p = viewHolder.view.tag as Parts
         p.name.text = album.albumName
-        p.count.text = "${UiFormat.count(album.assetCount)} ${if (album.assetCount == 1) "photo" else "photos"}"
+        p.count.text = nl.giejay.android.tv.immich.shared.util.Tr.photos(album.assetCount)
         val url = ApiUtil.getThumbnailUrl(album.albumThumbnailAssetId, "preview")
         if (url != null) Glide.with(p.image).asBitmap().load(url).centerCrop().into(p.image) else p.image.setImageDrawable(null)
         p.cover.onFocusGained = { onFocused(album) }

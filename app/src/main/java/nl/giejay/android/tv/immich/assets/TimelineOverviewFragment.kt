@@ -91,7 +91,7 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
         root.addView(left, LinearLayout.LayoutParams(dp(165), ViewGroup.LayoutParams.MATCH_PARENT))
 
         val title = TextView(ctx)
-        title.text = "Timeline"
+        title.text = nl.giejay.android.tv.immich.shared.util.Tr.t("Timeline")
         title.includeFontPadding = false
         UiStyleProvider.applyTitle(title, tokens, 28f)
         // CSS line-height 1: the text box is as tall as the font size
@@ -375,7 +375,7 @@ private class MonthCellPresenter(
         // empty month: "December" with "No photos yet" under it
         val emptyNote = TextView(ctx)
         emptyNote.includeFontPadding = false
-        emptyNote.text = "No photos yet"
+        emptyNote.text = nl.giejay.android.tv.immich.shared.util.Tr.t("No photos yet")
         UiStyleProvider.applyBody(emptyNote, tokens, 11f, tokens.dim)
         card.addView(emptyNote, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             gravity = Gravity.BOTTOM

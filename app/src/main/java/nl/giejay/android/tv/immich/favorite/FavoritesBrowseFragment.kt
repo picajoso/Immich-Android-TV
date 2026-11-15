@@ -62,13 +62,13 @@ class FavoritesBrowseFragment : GenericAssetFragment() {
     override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // "231 photos" + Slideshow before the date pill (googletv-11)
-        setHeaderAction("Slideshow", android.R.drawable.ic_media_play, null) { startSlideshow() }
+        setHeaderAction(nl.giejay.android.tv.immich.shared.util.Tr.t("Slideshow"), android.R.drawable.ic_media_play, null) { startSlideshow() }
         val client = nl.giejay.android.tv.immich.shared.util.currentApiClient() ?: return
         viewLifecycleOwner.lifecycleScope.launch {
             val stats = withContext(Dispatchers.IO) { client.assetStatistics(isFavorite = true) }
             stats.getOrNull()?.let { st ->
-                setHeaderAction("Slideshow", android.R.drawable.ic_media_play,
-                    "${nl.giejay.android.tv.immich.ui.UiFormat.count(st.total)} photos") { startSlideshow() }
+                setHeaderAction(nl.giejay.android.tv.immich.shared.util.Tr.t("Slideshow"), android.R.drawable.ic_media_play,
+                    nl.giejay.android.tv.immich.shared.util.Tr.photos(st.total)) { startSlideshow() }
             }
         }
     }

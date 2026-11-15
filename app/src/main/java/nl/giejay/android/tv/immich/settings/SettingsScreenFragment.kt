@@ -84,12 +84,12 @@ abstract class SettingsScreenFragment : LeanbackSettingsFragmentCompat() {
             layout.fold(
                 { layoutId -> setPreferencesFromResource(layoutId, rootKey) },
                 { prefScreen ->
-                    preferenceScreen.title = prefScreen.title
+                    preferenceScreen.title = nl.giejay.android.tv.immich.shared.util.Tr.t(prefScreen.title)
                     prefScreen.children.forEach {
                         val preferenceCategory = PreferenceCategory(requireContext())
                         preferenceScreen.addPreference(preferenceCategory)
                         if(it.title.isNotBlank()){
-                            preferenceCategory.title = it.title
+                            preferenceCategory.title = nl.giejay.android.tv.immich.shared.util.Tr.t(it.title)
                         }
                         it.children.forEach { child ->
                             preferenceCategory.addPreference(child.createPreference(requireContext()))

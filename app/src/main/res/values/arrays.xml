@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="grid_columns_titles">
-        <item>3 Columnas (Grande)</item>
-        <item>4 Columnas (Estándar)</item>
-        <item>5 Columnas (Pequeño)</item>
+        <item>3 columns (large)</item>
+        <item>4 columns (standard)</item>
+        <item>5 columns (small)</item>
     </string-array>
     
     <string-array name="grid_columns_values">

@@ -3,15 +3,15 @@ package nl.giejay.android.tv.immich.shared.prefs
 enum class ContentType:EnumWithTitle {
     ALL {
         override fun getTitle(): String {
-            return "All"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("All")
         }
     }, IMAGE {
         override fun getTitle(): String {
-            return "Image"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Image")
         }
     }, VIDEO {
         override fun getTitle(): String {
-            return "Video"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Video")
         }
     }
 }

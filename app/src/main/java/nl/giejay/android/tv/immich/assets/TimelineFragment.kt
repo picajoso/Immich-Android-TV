@@ -42,7 +42,7 @@ class TimelineFragment : GenericAssetFragment() {
         get() = monthLabel(arguments?.getString("timeBucket"), "MMMM")?.replaceFirstChar { it.titlecase() } ?: "Timeline"
 
     override val photoGridBreadcrumb: String?
-        get() = arguments?.getString("timeBucket")?.takeIf { it.length >= 4 }?.let { "Timeline \u203A ${it.substring(0, 4)}" }
+        get() = arguments?.getString("timeBucket")?.takeIf { it.length >= 4 }?.let { "${nl.giejay.android.tv.immich.shared.util.Tr.t("Timeline")} \u203A ${it.substring(0, 4)}" }
 
     private fun monthLabel(timeBucket: String?, skeleton: String): String? {
         if (timeBucket == null || timeBucket.length < 7) return null

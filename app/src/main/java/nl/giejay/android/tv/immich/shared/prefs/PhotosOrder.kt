@@ -12,7 +12,7 @@ enum class PhotosOrder(val sort: Comparator<Asset>): EnumWithTitle {
         }
     ) {
         override fun getTitle(): String {
-            return "Newest - Oldest"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Newest - Oldest")
         }
     },
     OLDEST_NEWEST(
@@ -23,7 +23,7 @@ enum class PhotosOrder(val sort: Comparator<Asset>): EnumWithTitle {
         }
     ) {
         override fun getTitle(): String {
-            return "Oldest - Newest"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Oldest - Newest")
         }
     };
 

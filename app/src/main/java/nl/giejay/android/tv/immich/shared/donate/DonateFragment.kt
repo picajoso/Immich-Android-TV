@@ -28,8 +28,8 @@ class DonateFragment : GuidedStepSupportFragment() {
         val icon: Drawable =
             requireContext().getDrawable(nl.giejay.android.tv.immich.R.drawable.icon)!!
         return GuidanceStylist.Guidance(
-            "Donation",
-            "Developing this app takes a lot of effort, if you would like to show your appreciation, you can donate using the following options.",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Donation"),
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Developing this app takes a lot of effort, if you would like to show your appreciation, you can donate using the following options."),
             "",
             icon
         )
@@ -45,7 +45,7 @@ class DonateFragment : GuidedStepSupportFragment() {
             if (it) {
                 donateService.getProducts { products ->
                     if (products.isEmpty()) {
-                        showToastAndFinish("You have exhausted your donate options, thanks!")
+                        showToastAndFinish(nl.giejay.android.tv.immich.shared.util.Tr.t("You have exhausted your donate options, thanks!"))
                         return@getProducts
                     }
                     this.products = products
@@ -65,7 +65,7 @@ class DonateFragment : GuidedStepSupportFragment() {
                     setActions(actions)
                 }
             } else {
-                showToastAndFinish("Could not initialize donation service, sorry!")
+                showToastAndFinish(nl.giejay.android.tv.immich.shared.util.Tr.t("Could not initialize donation service, sorry!"))
             }
         }
     }

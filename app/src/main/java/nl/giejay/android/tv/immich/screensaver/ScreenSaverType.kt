@@ -5,22 +5,22 @@ import nl.giejay.android.tv.immich.shared.prefs.EnumWithTitle
 enum class ScreenSaverType : EnumWithTitle {
     ALBUMS {
         override fun getTitle(): String {
-            return "Albums"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Albums")
         }
     },
     RANDOM {
         override fun getTitle(): String {
-            return "Random"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Random")
         }
     },
     RECENT {
         override fun getTitle(): String {
-            return "Recent"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Recent")
         }
     },
     SIMILAR_TIME_PERIOD {
         override fun getTitle(): String {
-            return "Seasonal"
+            return nl.giejay.android.tv.immich.shared.util.Tr.t("Seasonal")
         }
     }
 }

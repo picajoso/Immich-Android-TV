@@ -31,7 +31,7 @@ class AuthFragmentStep1 : GuidedStepSupportFragment() {
             requireContext().getDrawable(R.drawable.icon)!!
         return GuidanceStylist.Guidance(
             "Immich TV (${BuildConfig.VERSION_NAME})",
-            "Login to your Immich server or try a demo.",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Login to your Immich server or try a demo."),
             "",
             icon
         )
@@ -41,24 +41,24 @@ class AuthFragmentStep1 : GuidedStepSupportFragment() {
         addCheckedAction(
             actions,
             ACTION_SIGN_IN,
-            "Sign in by API key",
-            "Login to your Immich instance by entering your API key.",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Sign in by API key"),
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Login to your Immich instance by entering your API key."),
             true,
             1
         )
         addCheckedAction(
             actions,
             ACTION_PHONE_SIGN_IN,
-            "Sign in by phone",
-            "Login to your Immich instance by phone.",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Sign in by phone"),
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Login to your Immich instance by phone."),
             false,
             1
         )
         addCheckedAction(
             actions,
             ACTION_DEMO,
-            "Demo mode",
-            "Login to a demo Immich instance.",
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Demo mode"),
+            nl.giejay.android.tv.immich.shared.util.Tr.t("Login to a demo Immich instance."),
             false,
             1
         )
@@ -69,7 +69,7 @@ class AuthFragmentStep1 : GuidedStepSupportFragment() {
         savedInstanceState: Bundle?
     ) {
         super.onCreateButtonActions(actions, savedInstanceState)
-        addAction(actions, ACTION_CONTINUE, "Continue", "")
+        addAction(actions, ACTION_CONTINUE, nl.giejay.android.tv.immich.shared.util.Tr.t("Continue"), "")
     }
 
     override fun onGuidedActionClicked(action: GuidedAction) {

@@ -61,7 +61,7 @@ abstract class PhotoRowsFragment : Fragment(), BrowseSupportFragment.MainFragmen
 
     abstract val pageTitle: String
     protected open val showHero: Boolean get() = false
-    protected open val emptyText: String get() = "No photos found"
+    protected open val emptyText: String get() = nl.giejay.android.tv.immich.shared.util.Tr.t("No photos found")
     protected open fun subtitle(): String? = null
 
     /** Chips shown (selected, display only) under the title. */

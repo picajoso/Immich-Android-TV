@@ -87,7 +87,7 @@ class AuthByPhoneFragment : Fragment() {
             .asFlow()
             .onEach { delay(3_000) } // specify delay
             .onCompletion {
-                showErrorMessage("Did not authenticate within the timeout, recreating QR code.")
+                showErrorMessage(nl.giejay.android.tv.immich.shared.util.Tr.t("Did not authenticate within the timeout, recreating QR code."))
                 rebootQRFlow(findNavController())
             }
         timer.collect {
@@ -120,7 +120,7 @@ class AuthByPhoneFragment : Fragment() {
                         .build()
                 )
             } else {
-                showErrorMessage("Invalid Server URL or API key, try scanning again!")
+                showErrorMessage(nl.giejay.android.tv.immich.shared.util.Tr.t("Invalid Server URL or API key, try scanning again!"))
                 rebootQRFlow(findNavController)
             }
         }

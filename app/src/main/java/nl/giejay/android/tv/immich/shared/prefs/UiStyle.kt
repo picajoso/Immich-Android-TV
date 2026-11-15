@@ -6,10 +6,10 @@ package nl.giejay.android.tv.immich.shared.prefs
  */
 enum class UiStyle : EnumWithTitle {
     APPLE {
-        override fun getTitle(): String = "Apple"
+        override fun getTitle(): String = nl.giejay.android.tv.immich.shared.util.Tr.t("Apple")
     },
     GOOGLE_TV {
-        override fun getTitle(): String = "Google TV"
+        override fun getTitle(): String = nl.giejay.android.tv.immich.shared.util.Tr.t("Google TV")
     };
 
     companion object {

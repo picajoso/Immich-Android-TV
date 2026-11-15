@@ -20,7 +20,7 @@
             android:layout_width="220dp"
             android:layout_height="160dp"
             android:scaleType="centerCrop"
-            android:contentDescription="Foto de la línea de tiempo" />
+            android:contentDescription="@string/t_timeline_photo" />
 
         <ImageView
             android:id="@+id/icon_favorite"

@@ -11,7 +11,7 @@ class RandomAssetsFragment : GenericAssetFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHeaderAction("Shuffle", nl.giejay.android.tv.immich.R.drawable.ic_nav_random) { shuffle() }
+        setHeaderAction(nl.giejay.android.tv.immich.shared.util.Tr.t("Shuffle"), nl.giejay.android.tv.immich.R.drawable.ic_nav_random) { shuffle() }
     }
 
     /** Throws the current grid away and loads a new random selection. */

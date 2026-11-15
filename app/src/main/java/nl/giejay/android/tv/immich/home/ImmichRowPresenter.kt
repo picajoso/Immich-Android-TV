@@ -88,7 +88,7 @@ class ImmichRowPresenter : Presenter() {
                 updateIconTint(vh, UiStyle.GOOGLE_TV, vh.tvTitle.isFocused)
             }
         }
-        vh.tvTitle.text = headerItem?.name
+        vh.tvTitle.text = headerItem?.name?.let { nl.giejay.android.tv.immich.shared.util.Tr.t(it) }
 
         val count = headerItem?.name?.let { counts[it] }
         vh.count.text = count
@@ -104,7 +104,7 @@ class ImmichRowPresenter : Presenter() {
 
         if (editMode) {
             if (headerItem?.name == "Edit") {
-                vh.tvTitle.text = "Done"
+                vh.tvTitle.text = nl.giejay.android.tv.immich.shared.util.Tr.t("Done")
             } else {
                 vh.icon.visibility = View.VISIBLE
                 if (PreferenceManager.itemInStringSet(headerItem?.name, HIDDEN_HOME_ITEMS)) {

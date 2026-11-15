@@ -60,7 +60,7 @@ class ImmichMediaSlider : MediaSliderFragment() {
         keyEvents = ViewModelProvider(requireActivity())[KeyEventsViewModel::class.java]
 
         if (config.items.isEmpty()) {
-            Toast.makeText(requireContext(), "No items to play", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), nl.giejay.android.tv.immich.shared.util.Tr.t("No items to play"), Toast.LENGTH_SHORT).show()
             findNavController().popBackStack()
             return
         }

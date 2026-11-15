@@ -80,7 +80,7 @@ class AppleAlbumsView(
         // text block at left 96px, top 290px
         heroText.orientation = LinearLayout.VERTICAL
         val label = TextView(context)
-        label.text = "LATEST ALBUM"
+        label.text = nl.giejay.android.tv.immich.shared.util.Tr.t("Latest album").uppercase()
         label.includeFontPadding = false
         UiStyleProvider.applyBody(label, tokens, 11f, 0xD9FFFFFF.toInt())
         label.typeface = UiStyleProvider.titleTypeface(tokens)
@@ -106,8 +106,8 @@ class AppleAlbumsView(
             topMargin = dp(145)
         })
 
-        buildSection(myBlock, "My Albums", myAdapter, MY_TOP_DP)
-        buildSection(sharedBlock, "Shared Albums", sharedAdapter, SHARED_TOP_DP)
+        buildSection(myBlock, nl.giejay.android.tv.immich.shared.util.Tr.t("My Albums"), myAdapter, MY_TOP_DP)
+        buildSection(sharedBlock, nl.giejay.android.tv.immich.shared.util.Tr.t("Shared Albums"), sharedAdapter, SHARED_TOP_DP)
         sharedBlock.visibility = View.GONE
     }
 
@@ -170,7 +170,7 @@ class AppleAlbumsView(
     }
 
     private fun photoCount(count: Int): String =
-        "${nl.giejay.android.tv.immich.ui.UiFormat.count(count)} ${if (count == 1) "photo" else "photos"}"
+        nl.giejay.android.tv.immich.shared.util.Tr.photos(count)
 
     private fun cardPresenter(row: () -> Int) = object : Presenter() {
         override fun onCreateViewHolder(parent: ViewGroup): ViewHolder = ViewHolder(AlbumCard(parent.context))

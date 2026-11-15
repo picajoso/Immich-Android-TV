@@ -45,9 +45,9 @@ sealed class Pref<T, PREF : Preference, PREFTYPE>(val defaultValue: T, val title
     open fun createPreference(context: Context): PREF {
         val createPref = createPref(context)
         createPref.key = key()
-        createPref.title = title
+        createPref.title = nl.giejay.android.tv.immich.shared.util.Tr.t(title)
         createPref.setDefaultValue(toPrefValue(defaultValue))
-        createPref.summary = summary
+        createPref.summary = nl.giejay.android.tv.immich.shared.util.Tr.t(summary)
         return createPref
     }
 
@@ -110,7 +110,7 @@ sealed class EnumPref<T>(defaultValue: T, title: String, summary: String,
     override fun createPref(context: Context): ListPreference {
         val listPreference = ListPreference(context)
         listPreference.setEntries(titlesResourceId)
-        listPreference.dialogTitle = summary
+        listPreference.dialogTitle = nl.giejay.android.tv.immich.shared.util.Tr.t(summary)
         listPreference.setEntryValues(valuesResourceId)
         return listPreference
     }
@@ -136,7 +136,7 @@ sealed class EnumByTitlePref<T>(defaultValue: T, title: String, summary: String)
     override fun createPref(context: Context): ListPreference {
         val listPreference = ListPreference(context)
         listPreference.entries = getEnumEntries().map { it.getTitle() }.toTypedArray()
-        listPreference.dialogTitle = summary
+        listPreference.dialogTitle = nl.giejay.android.tv.immich.shared.util.Tr.t(summary)
         listPreference.entryValues = getEnumEntries().map { it.toString() }.toTypedArray()
         return listPreference
     }
@@ -221,7 +221,7 @@ sealed class IntListPref(defaultValue: Int, title: String, summary: String,
     override fun createPref(context: Context): ListPreference {
         val listPreference = ListPreference(context)
         listPreference.setEntries(titlesResourceId)
-        listPreference.dialogTitle = summary
+        listPreference.dialogTitle = nl.giejay.android.tv.immich.shared.util.Tr.t(summary)
         listPreference.setEntryValues(valuesResourceId)
         return listPreference
     }

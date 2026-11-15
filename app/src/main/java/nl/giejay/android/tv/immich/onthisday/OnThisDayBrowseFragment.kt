@@ -26,9 +26,9 @@ import java.util.Locale
  */
 class OnThisDayBrowseFragment : PhotoRowsFragment() {
 
-    override val pageTitle: String get() = "On this day"
+    override val pageTitle: String get() = nl.giejay.android.tv.immich.shared.util.Tr.t("On this day")
     override val showHero: Boolean get() = true
-    override val emptyText: String get() = "No photos from this day in previous years"
+    override val emptyText: String get() = nl.giejay.android.tv.immich.shared.util.Tr.t("No photos from this day in previous years")
 
     override fun subtitle(): String {
         val locale = Locale.getDefault(Locale.Category.FORMAT)
@@ -73,9 +73,9 @@ class OnThisDayBrowseFragment : PhotoRowsFragment() {
 
     private fun rowTitle(yearsAgo: Int, year: Int, city: String?, count: Int): CharSequence {
         val ago = when (yearsAgo) {
-            0 -> "This year"
-            1 -> "1 year ago"
-            else -> "$yearsAgo years ago"
+            0 -> nl.giejay.android.tv.immich.shared.util.Tr.t("This year")
+            1 -> nl.giejay.android.tv.immich.shared.util.Tr.t("1 year ago")
+            else -> nl.giejay.android.tv.immich.shared.util.Tr.t("%d years ago").replace("%d", yearsAgo.toString())
         }
         val text = SpannableStringBuilder(ago)
         text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

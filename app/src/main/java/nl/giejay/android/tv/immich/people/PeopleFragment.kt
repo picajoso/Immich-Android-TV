@@ -63,7 +63,7 @@ class PeopleFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterProv
         header.gravity = Gravity.CENTER_VERTICAL
         header.setPadding(padH, UiStyleProvider.dp(ctx, tokens.contentPaddingTopDp), padH, 0)
         val title = TextView(ctx)
-        title.text = "People"
+        title.text = nl.giejay.android.tv.immich.shared.util.Tr.t("People")
         title.includeFontPadding = false
         UiStyleProvider.applyTitle(title, tokens)
         header.addView(title, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
@@ -126,7 +126,7 @@ class PeopleFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterProv
 
     private fun showPeople(people: List<Person>) {
         if (!isAdded || view == null) return
-        peopleCount.text = "${people.size} people"
+        peopleCount.text = nl.giejay.android.tv.immich.shared.util.Tr.people(people.size)
         val client = currentApiClient()
         val counts = mutableMapOf<java.util.UUID, Int>()
         val asked = mutableSetOf<java.util.UUID>()
@@ -142,7 +142,7 @@ class PeopleFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterProv
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToPersonAssetsFragment(
                     person.id.toString(),
-                    person.name?.takeIf { it.isNotBlank() } ?: "Unknown"
+                    person.name?.takeIf { it.isNotBlank() } ?: nl.giejay.android.tv.immich.shared.util.Tr.t("Unknown")
                 )
             )
         }
@@ -230,7 +230,7 @@ private class PersonCardPresenter(
         }
         p.personId = person.id
         val named = !person.name.isNullOrBlank()
-        p.name.text = if (named) person.name else "Add a name"
+        p.name.text = if (named) person.name else nl.giejay.android.tv.immich.shared.util.Tr.t("Add a name")
         p.name.setTextColor(if (named) tokens.text else tokens.accent)
         val known = counts[person.id]
         p.count.text = if (known != null) photos(known) else ""
@@ -244,7 +244,7 @@ private class PersonCardPresenter(
         p.cover.setOnClickListener { onClicked(person) }
     }
 
-    private fun photos(n: Int) = "${nl.giejay.android.tv.immich.ui.UiFormat.count(n)} ${if (n == 1) "photo" else "photos"}"
+    private fun photos(n: Int) = nl.giejay.android.tv.immich.shared.util.Tr.photos(n)
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {
         val p = viewHolder.view.tag as Parts

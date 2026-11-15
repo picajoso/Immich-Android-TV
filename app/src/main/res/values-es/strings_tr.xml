@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from the Tr.t("...") texts of the code; see shared/util/Tr.kt -->
+<resources>
+    <string name="t_1_year_ago" formatted="false">Hace 1 año</string>
+    <string name="t_add_a_name" formatted="false">Añadir nombre</string>
+    <string name="t_address" formatted="false">Dirección</string>
+    <string name="t_albums" formatted="false">Álbumes</string>
+    <string name="t_align" formatted="false">Alinear</string>
+    <string name="t_alignment_of_metadata" formatted="false">Alineación del metadato</string>
+    <string name="t_all" formatted="false">Todo</string>
+    <string name="t_alphabetically_a_z" formatted="false">Alfabético (A-Z)</string>
+    <string name="t_alphabetically_z_a" formatted="false">Alfabético (Z-A)</string>
+    <string name="t_api_key" formatted="false">Clave de API</string>
+    <string name="t_appearance" formatted="false">Apariencia</string>
+    <string name="t_apple" formatted="false">Apple</string>
+    <string name="t_asset_count" formatted="false">Número de elementos</string>
+    <string name="t_assets_outside_albums" formatted="false">Elementos fuera de álbumes</string>
+    <string name="t_change_server" formatted="false">Cambiar de servidor</string>
+    <string name="t_choose_what_appears_in_the_side_menu_ok_turns_a_section_on_o" formatted="false">Elige qué aparece en el menú lateral.\nOK activa o desactiva una sección.</string>
+    <string name="t_close" formatted="false">Cerrar</string>
+    <string name="t_collections" formatted="false">Colecciones</string>
+    <string name="t_columns" formatted="false">Columnas</string>
+    <string name="t_configure_what_to_show_in_screensaver" formatted="false">Configura qué mostrar en el salvapantallas</string>
+    <string name="t_configure_what_to_show_in_the_different_views" formatted="false">Configura qué mostrar en cada vista</string>
+    <string name="t_configure_what_to_show_in_viewer" formatted="false">Configura qué mostrar en el visor</string>
+    <string name="t_configured" formatted="false">Configurado</string>
+    <string name="t_connection_to_your_immich_server" formatted="false">Conexión con tu servidor Immich</string>
+    <string name="t_content_type" formatted="false">Tipo de contenido</string>
+    <string name="t_continue" formatted="false">Continuar</string>
+    <string name="t_continuous_navigation_enabled" formatted="false">Navegación continua activada</string>
+    <string name="t_could_not_finalize_donation_due_to_error_please_contact_the_" formatted="false">No se pudo finalizar la donación por un error; contacta con el desarrollador.</string>
+    <string name="t_could_not_initialize_donation_service_sorry" formatted="false">No se pudo iniciar el servicio de donaciones, ¡lo siento!</string>
+    <string name="t_could_not_load_assets_from_immich" formatted="false">No se pudieron cargar los elementos de Immich</string>
+    <string name="t_could_not_open_the_screensaver_settings_on_this_device_you_c" formatted="false">No se pudieron abrir los ajustes del salvapantallas en este dispositivo. Puedes activarlo con estos pasos:\n\n\n1. Activa el modo desarrollador en el dispositivo (pulsa 7 veces el número de compilación o «Compilación de Android TV OS» en Sistema > Información).\n\n2. Ve a Sistema > Opciones de desarrollador y activa la depuración USB.\n\n3. Si no tienes ADB instalado en el ordenador, sigue estas instrucciones: https://www.xda-developers.com/install-adb-windows-macos-linux/\n4. Tras instalar ADB en el ordenador, conéctate al dispositivo con su IP: \'adb connect 192.168.xx.xx\'.\n\n5. Una vez conectado, ejecuta este comando: \'adb shell settings put secure screensaver_components nl.giejay.android.tv.immich/.screensaver.ScreenSaverService\'\n\n6. ¡Listo!\n\nTambién puedes consultar las instrucciones en la página de GitHub: https://github.com/giejay/Immich-Android-TV</string>
+    <string name="t_could_not_start_screensaver_for_immich_because_of_invalid_ho" formatted="false">No se pudo iniciar el salvapantallas de Immich: servidor o clave de API no válidos</string>
+    <string name="t_customize_metadata" formatted="false">Personalizar metadatos</string>
+    <string name="t_customize_screensaver_metadata" formatted="false">Personalizar metadatos del salvapantallas</string>
+    <string name="t_customize_view" formatted="false">Personalizar vista</string>
+    <string name="t_d_people" formatted="false">%d personas</string>
+    <string name="t_d_person" formatted="false">%d persona</string>
+    <string name="t_d_photo" formatted="false">%d foto</string>
+    <string name="t_d_photos" formatted="false">%d fotos</string>
+    <string name="t_d_years_ago" formatted="false">Hace %d años</string>
+    <string name="t_debug" formatted="false">Depuración</string>
+    <string name="t_debug_mode" formatted="false">Modo depuración</string>
+    <string name="t_debug_settings" formatted="false">Ajustes de depuración</string>
+    <string name="t_delete_item" formatted="false">Eliminar elemento</string>
+    <string name="t_demo_mode" formatted="false">Modo demo</string>
+    <string name="t_developing_this_app_takes_a_lot_of_effort_if_you_would_like_" formatted="false">Desarrollar esta app requiere mucho esfuerzo; si quieres mostrar tu agradecimiento, puedes donar con las siguientes opciones.</string>
+    <string name="t_did_not_authenticate_within_the_timeout_recreating_qr_code" formatted="false">No se autenticó a tiempo; se vuelve a generar el código QR.</string>
+    <string name="t_disable_ssl_verification" formatted="false">Desactivar verificación SSL</string>
+    <string name="t_donate" formatted="false">Donar</string>
+    <string name="t_donation" formatted="false">Donación</string>
+    <string name="t_done" formatted="false">Hecho</string>
+    <string name="t_edit" formatted="false">Editar</string>
+    <string name="t_edit_menu" formatted="false">Editar menú</string>
+    <string name="t_edit_metadata" formatted="false">Editar metadatos</string>
+    <string name="t_enable_debug_mode" formatted="false">Activar modo depuración</string>
+    <string name="t_enable_this_if_you_are_experiencing_issues" formatted="false">Actívalo si tienes problemas.</string>
+    <string name="t_enable_this_if_you_are_experiencing_issues_with_getting_the_" formatted="false">Actívalo si tienes problemas al obtener los datos de Immich.</string>
+    <string name="t_error_navigating_to_the_viewer" formatted="false">Error al abrir el visor</string>
+    <string name="t_exclude_assets_in_specific_albums_for_random_seasonal_view" formatted="false">Excluye elementos de álbumes concretos en las vistas aleatoria y por estación</string>
+    <string name="t_excluded_albums" formatted="false">Álbumes excluidos</string>
+    <string name="t_favorites" formatted="false">Favoritos</string>
+    <string name="t_filter_by_content_type" formatted="false">Filtrar por tipo de contenido</string>
+    <string name="t_filtering" formatted="false">Filtrado</string>
+    <string name="t_folders" formatted="false">Carpetas</string>
+    <string name="t_font_size" formatted="false">Tamaño de fuente</string>
+    <string name="t_google_tv" formatted="false">Google TV</string>
+    <string name="t_hostname" formatted="false">Servidor</string>
+    <string name="t_how_many_years_to_go_back_when_selecting_seasonal_photos" formatted="false">Cuántos años hacia atrás buscar fotos por estación</string>
+    <string name="t_image" formatted="false">Imagen</string>
+    <string name="t_include_videos" formatted="false">Incluir vídeos</string>
+    <string name="t_include_videos_in_screensaver" formatted="false">Incluye vídeos en el salvapantallas</string>
+    <string name="t_interface_style" formatted="false">Estilo de interfaz</string>
+    <string name="t_interface_style_grid_thumbnails" formatted="false">Estilo de interfaz, cuadrícula, miniaturas</string>
+    <string name="t_interval" formatted="false">Intervalo</string>
+    <string name="t_interval_of_the_screensaver" formatted="false">Intervalo del salvapantallas</string>
+    <string name="t_interval_of_the_slideshow" formatted="false">Intervalo de la presentación</string>
+    <string name="t_invalid_immich_server_settings_redirecting_to_login_screen" formatted="false">Ajustes del servidor Immich no válidos; se vuelve a la pantalla de inicio de sesión.</string>
+    <string name="t_invalid_server_url_or_api_key_try_scanning_again" formatted="false">URL del servidor o clave de API no válidas, ¡vuelve a escanear!</string>
+    <string name="t_last_updated" formatted="false">Última actualización</string>
+    <string name="t_latest_album" formatted="false">Último álbum</string>
+    <string name="t_least_updated" formatted="false">Menos reciente</string>
+    <string name="t_library" formatted="false">Biblioteca</string>
+    <string name="t_load_selected_item_as_background" formatted="false">Cargar el elemento seleccionado como fondo</string>
+    <string name="t_load_the_currently_selected_image_album_as_the_background" formatted="false">Carga la imagen o el álbum seleccionado como fondo</string>
+    <string name="t_login_to_a_demo_immich_instance" formatted="false">Inicia sesión en una instancia de demostración de Immich.</string>
+    <string name="t_login_to_your_immich_instance_by_entering_your_api_key" formatted="false">Inicia sesión en tu instancia de Immich introduciendo tu clave de API.</string>
+    <string name="t_login_to_your_immich_instance_by_phone" formatted="false">Inicia sesión en tu instancia de Immich desde el móvil.</string>
+    <string name="t_login_to_your_immich_server_or_try_a_demo" formatted="false">Inicia sesión en tu servidor Immich o prueba una demo.</string>
+    <string name="t_logs_and_diagnostics" formatted="false">Registros y diagnóstico</string>
+    <string name="t_look_of_the_app_apple_or_google_tv" formatted="false">Aspecto de la app: Apple o Google TV</string>
+    <string name="t_maximum_percentage_to_cut_off_image_height_if_using_safecent" formatted="false">Porcentaje máximo de alto que se recorta con SafeCenterCrop</string>
+    <string name="t_maximum_percentage_to_cut_off_image_width_if_using_safecente" formatted="false">Porcentaje máximo de ancho que se recorta con SafeCenterCrop</string>
+    <string name="t_merge_portrait_photos" formatted="false">Juntar fotos verticales</string>
+    <string name="t_metadata" formatted="false">Metadatos</string>
+    <string name="t_my_albums" formatted="false">Mis álbumes</string>
+    <string name="t_newest_oldest" formatted="false">Más nuevas primero</string>
+    <string name="t_no_assets_to_show_for_screensaver_please_configure_a_differe" formatted="false">No hay elementos para el salvapantallas. Configura otro tipo de salvapantallas en los ajustes.</string>
+    <string name="t_no_items_to_play" formatted="false">No hay nada que reproducir</string>
+    <string name="t_no_photos_found" formatted="false">No se han encontrado fotos</string>
+    <string name="t_no_photos_from_this_day_in_previous_years" formatted="false">No hay fotos de este día en años anteriores</string>
+    <string name="t_no_photos_yet" formatted="false">Aún sin fotos</string>
+    <string name="t_not_possible_to_set_screensaver" formatted="false">No se puede configurar el salvapantallas</string>
+    <string name="t_not_set" formatted="false">Sin configurar</string>
+    <string name="t_not_signed_in" formatted="false">Sin sesión iniciada</string>
+    <string name="t_number_of_grid_columns" formatted="false">Número de columnas de la cuadrícula</string>
+    <string name="t_off" formatted="false">Desactivado</string>
+    <string name="t_oldest_newest" formatted="false">Más antiguas primero</string>
+    <string name="t_on" formatted="false">Activado</string>
+    <string name="t_on_this_day" formatted="false">Tal día como hoy</string>
+    <string name="t_only_use_this_when_you_have_issues_with_self_signed_certific" formatted="false">¡Úsalo solo si tienes problemas con certificados autofirmados!</string>
+    <string name="t_open" formatted="false">Abrir</string>
+    <string name="t_open_debug_settings" formatted="false">Abrir ajustes de depuración</string>
+    <string name="t_open_screensaver_settings" formatted="false">Abrir ajustes del salvapantallas</string>
+    <string name="t_open_view_settings" formatted="false">Abrir ajustes de vista</string>
+    <string name="t_options" formatted="false">Opciones</string>
+    <string name="t_or_enter_the_code_on_https_immich_giejay_nl" formatted="false">O introduce el código en https://immich.giejay.nl</string>
+    <string name="t_order" formatted="false">Orden</string>
+    <string name="t_order_of_metadata" formatted="false">Orden del metadato</string>
+    <string name="t_ordering" formatted="false">Orden</string>
+    <string name="t_other" formatted="false">Otros</string>
+    <string name="t_padding" formatted="false">Relleno</string>
+    <string name="t_padding_above_and_below_the_item" formatted="false">Espacio encima y debajo del elemento</string>
+    <string name="t_people" formatted="false">Personas</string>
+    <string name="t_photo_transformation" formatted="false">Transformación de la foto</string>
+    <string name="t_photos" formatted="false">Fotos</string>
+    <string name="t_photos_in_albums" formatted="false">Fotos en álbumes</string>
+    <string name="t_play_sound" formatted="false">Reproducir sonido</string>
+    <string name="t_play_sound_of_videos_during_screensaver" formatted="false">Reproduce el sonido de los vídeos durante el salvapantallas</string>
+    <string name="t_please_enter_a_server_url_https" formatted="false">Introduce la URL del servidor (https://...)</string>
+    <string name="t_please_enter_a_valid_server_url_https" formatted="false">Introduce una URL de servidor válida (https://...)</string>
+    <string name="t_please_enter_an_api_key_if_you_did_enter_it_try_to_highlight" formatted="false">Introduce una clave de API. Si ya la has introducido, selecciónala de nuevo y pulsa Intro/OK, no Atrás (perdona).</string>
+    <string name="t_please_set_your_albums_to_show_first" formatted="false">¡Elige primero los álbumes que quieres mostrar!</string>
+    <string name="t_random" formatted="false">Aleatorio</string>
+    <string name="t_recent" formatted="false">Recientes</string>
+    <string name="t_recent_photos_months_back" formatted="false">Meses atrás de las fotos recientes</string>
+    <string name="t_recently_added" formatted="false">Añadidas recientemente</string>
+    <string name="t_recently_taken" formatted="false">Tomadas recientemente</string>
+    <string name="t_reset_to_default" formatted="false">Restablecer</string>
+    <string name="t_safe_center_crop_max_cutoff_height" formatted="false">Recorte máximo de alto en Safe Center Crop (%)</string>
+    <string name="t_safe_center_crop_max_cutoff_width" formatted="false">Recorte máximo de ancho en Safe Center Crop (%)</string>
+    <string name="t_save_item" formatted="false">Guardar elemento</string>
+    <string name="t_scan_the_qr_code_below" formatted="false">Escanea el código QR de abajo</string>
+    <string name="t_screensaver" formatted="false">Salvapantallas</string>
+    <string name="t_screensaver_options" formatted="false">Opciones del salvapantallas</string>
+    <string name="t_screensaver_settings" formatted="false">Ajustes del salvapantallas</string>
+    <string name="t_screensaver_type" formatted="false">Tipo de salvapantallas</string>
+    <string name="t_seasonal" formatted="false">Por estación</string>
+    <string name="t_seasonal_photos_period_in_days" formatted="false">Periodo de las fotos por estación (días)</string>
+    <string name="t_seasonal_photos_years_back" formatted="false">Años atrás de las fotos por estación</string>
+    <string name="t_server" formatted="false">Servidor</string>
+    <string name="t_server_url" formatted="false">URL del servidor</string>
+    <string name="t_server_url_http_s" formatted="false">URL del servidor (http[s]://...)</string>
+    <string name="t_set_albums_to_show_in_screensaver" formatted="false">Elegir álbumes del salvapantallas</string>
+    <string name="t_set_immich_as_screensaver" formatted="false">Usar Immich como salvapantallas</string>
+    <string name="t_set_the_immich_albums_to_show_in_the_screensaver_settings" formatted="false">Elige los álbumes de Immich que se mostrarán en los ajustes del salvapantallas</string>
+    <string name="t_set_the_order_in_which_albums_should_appear" formatted="false">Elige el orden en que aparecen los álbumes</string>
+    <string name="t_set_the_order_in_which_assets_should_appear_outside_albums" formatted="false">Elige el orden de los elementos fuera de los álbumes</string>
+    <string name="t_set_the_order_in_which_photos_should_appear" formatted="false">Elige el orden en que aparecen las fotos</string>
+    <string name="t_set_the_order_in_which_photos_should_appear_inside_albums" formatted="false">Elige el orden de las fotos dentro de los álbumes</string>
+    <string name="t_settings" formatted="false">Ajustes</string>
+    <string name="t_shared_albums" formatted="false">Álbumes compartidos</string>
+    <string name="t_show_album_name" formatted="false">Mostrar nombre del álbum</string>
+    <string name="t_show_album_name_of_asset_in_screensaver" formatted="false">Muestra el nombre del álbum del elemento en el salvapantallas</string>
+    <string name="t_show_city" formatted="false">Mostrar ciudad</string>
+    <string name="t_show_city_of_asset_in_slideshow" formatted="false">Muestra la ciudad del elemento en la presentación</string>
+    <string name="t_show_clock" formatted="false">Mostrar reloj</string>
+    <string name="t_show_clock_in_screensaver" formatted="false">Muestra el reloj en el salvapantallas</string>
+    <string name="t_show_date" formatted="false">Mostrar fecha</string>
+    <string name="t_show_date_of_asset_in_screensaver" formatted="false">Muestra la fecha del elemento en el salvapantallas</string>
+    <string name="t_show_date_of_asset_in_slideshow" formatted="false">Muestra la fecha del elemento en la presentación</string>
+    <string name="t_show_description" formatted="false">Mostrar descripción</string>
+    <string name="t_show_description_of_asset_in_screensaver" formatted="false">Muestra la descripción del elemento en el salvapantallas</string>
+    <string name="t_show_description_of_asset_in_slideshow" formatted="false">Muestra la descripción del elemento en la presentación</string>
+    <string name="t_show_file_names_in_grid" formatted="false">Mostrar nombres de archivo en la cuadrícula</string>
+    <string name="t_show_media_count" formatted="false">Mostrar contador</string>
+    <string name="t_show_only_videos" formatted="false">Mostrar solo vídeos</string>
+    <string name="t_show_the_file_name_below_photos_in_the_grid_view" formatted="false">Muestra el nombre del archivo bajo las fotos de la cuadrícula</string>
+    <string name="t_show_the_number_of_total_items_and_currently_selected_item" formatted="false">Muestra el total de elementos y el elemento actual</string>
+    <string name="t_show_two_portrait_photos_next_to_each_other" formatted="false">Muestra dos fotos verticales una junto a otra</string>
+    <string name="t_shuffle" formatted="false">Mezclar</string>
+    <string name="t_sign_in_by_api_key" formatted="false">Iniciar sesión con clave de API</string>
+    <string name="t_sign_in_by_phone" formatted="false">Iniciar sesión con el móvil</string>
+    <string name="t_slide_animation_speed_in_milliseconds" formatted="false">Velocidad de la animación en milisegundos</string>
+    <string name="t_slide_animation_speed_ms" formatted="false">Velocidad de la animación (ms)</string>
+    <string name="t_slide_the_new_asset_in" formatted="false">Deslizar el nuevo elemento</string>
+    <string name="t_slide_the_new_asset_in_when_transitioning" formatted="false">Desliza el nuevo elemento al cambiar de uno a otro</string>
+    <string name="t_slideshow" formatted="false">Presentación</string>
+    <string name="t_source_interval_metadata" formatted="false">Origen, intervalo, metadatos</string>
+    <string name="t_status" formatted="false">Estado</string>
+    <string name="t_submit" formatted="false">Enviar</string>
+    <string name="t_support_the_project" formatted="false">Apoya el proyecto</string>
+    <string name="t_thanks" formatted="false">Gracias</string>
+    <string name="t_thanks_for_your_donation_highly_appreciated" formatted="false">¡Gracias por tu donación, se agradece muchísimo!</string>
+    <string name="t_this_app_is_free_and_open_source" formatted="false">Esta app es gratuita y de código abierto</string>
+    <string name="t_this_year" formatted="false">Este año</string>
+    <string name="t_timeline" formatted="false">Cronología</string>
+    <string name="t_timeline_photo" formatted="false">Foto de la cronología</string>
+    <string name="t_type" formatted="false">Tipo</string>
+    <string name="t_type_of_metadata" formatted="false">Tipo de metadato</string>
+    <string name="t_unknown" formatted="false">Desconocido</string>
+    <string name="t_use_high_resolution_thumbnails" formatted="false">Usar miniaturas de alta resolución</string>
+    <string name="t_use_high_resolution_thumbnails_instead_of_native_full_images" formatted="false">Usa miniaturas de alta resolución en lugar de las imágenes originales. Acelera mucho la carga.</string>
+    <string name="t_user_id" formatted="false">ID de usuario</string>
+    <string name="t_video" formatted="false">Vídeo</string>
+    <string name="t_view_settings" formatted="false">Ajustes de vista</string>
+    <string name="t_what_to_show_albums_random_recent_etc" formatted="false">Qué mostrar: álbumes, aleatorio, recientes, etc.</string>
+    <string name="t_when_enabled_all_sections_will_only_show_videos" formatted="false">Si se activa, todas las secciones mostrarán solo vídeos</string>
+    <string name="t_you_already_added_every_possible_meta_data" formatted="false">Ya has añadido todos los metadatos posibles</string>
+    <string name="t_you_have_exhausted_your_donate_options_thanks" formatted="false">¡Has agotado tus opciones de donación, gracias!</string>
+    <string name="t_your_donation_could_not_be_completed" formatted="false">No se pudo completar tu donación</string>
+    <string name="t_your_user_id_needed_for_debugging" formatted="false">Tu ID de usuario, necesario para depurar</string>
+</resources>

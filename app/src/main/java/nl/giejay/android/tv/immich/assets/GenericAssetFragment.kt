@@ -27,7 +27,7 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
     open val gridTitle: String? get() = null
 
     override val usePhotoTiles: Boolean get() = gridTitle != null
-    override val photoGridTitle: String get() = gridTitle ?: ""
+    override val photoGridTitle: String get() = nl.giejay.android.tv.immich.shared.util.Tr.t(gridTitle ?: "")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val sortingKey = getSortingKey()

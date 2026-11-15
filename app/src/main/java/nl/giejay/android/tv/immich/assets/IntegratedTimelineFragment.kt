@@ -516,7 +516,7 @@ class IntegratedTimelineFragment : Fragment(), BrowseSupportFragment.MainFragmen
         }
         
         if (loadPreviousCallback != null) {
-             Toast.makeText(requireContext(), "Navegación continua habilitada", Toast.LENGTH_SHORT).show()
+             Toast.makeText(requireContext(), nl.giejay.android.tv.immich.shared.util.Tr.t("Continuous navigation enabled"), Toast.LENGTH_SHORT).show()
         }
 
         val config = MediaSliderConfiguration(
@@ -548,7 +548,7 @@ class IntegratedTimelineFragment : Fragment(), BrowseSupportFragment.MainFragmen
             try {
                 findNavController().navigate(R.id.action_timeline_to_photo_slider, bundle)
             } catch (e2: Exception) {
-                Toast.makeText(requireContext(), "Error navegando al visor", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), nl.giejay.android.tv.immich.shared.util.Tr.t("Error navigating to the viewer"), Toast.LENGTH_SHORT).show()
             }
         }
     }

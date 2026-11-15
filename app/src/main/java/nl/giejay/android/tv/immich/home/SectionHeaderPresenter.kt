@@ -31,7 +31,7 @@ class SectionHeaderPresenter : Presenter() {
         val label = viewHolder.view as TextView
         val context = label.context
         val row = item as? Row
-        label.text = row?.headerItem?.name
+        label.text = row?.headerItem?.name?.let { nl.giejay.android.tv.immich.shared.util.Tr.t(it) }
         // the first group label sits at the top, the next ones are separated from the rows above
         val first = (row?.headerItem?.id ?: -1L) == -1L
         label.setPadding(
