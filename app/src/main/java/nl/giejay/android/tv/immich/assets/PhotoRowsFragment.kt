@@ -242,7 +242,10 @@ private class PhotoRowPresenter(
         grid.clipChildren = false
         grid.clipToPadding = false
         grid.setPadding(0, UiStyleProvider.dp(ctx, 8), 0, UiStyleProvider.dp(ctx, 8))
-        column.addView(grid, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        // exactly one row of tiles: without a fixed height and row count Leanback wraps the tiles
+        // into as many rows as fit in the (unbounded) parent
+        grid.setNumRows(1)
+        column.addView(grid, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tileSizePx + UiStyleProvider.dp(ctx, 16)))
         return PhotoRowViewHolder(column, title, grid)
     }
 
