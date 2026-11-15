@@ -40,6 +40,17 @@ Immich is a self hosted backup solution for photos and videos. Current features 
 
 More info here: https://github.com/immich-app/immich
 
+## Screenshots
+
+Sample photos only. Left: Apple style. Right: Google TV style.
+
+|                                                  Apple style                                                  |                                                  Google TV style                                                  |
+|:-------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------:|
+| ![Photos](screenshots/demo/apple-photos.png) | ![Photos](screenshots/demo/google-photos.png) |
+| ![Albums](screenshots/demo/apple-albums.png) | ![Albums](screenshots/demo/google-albums.png) |
+| ![Timeline](screenshots/demo/apple-timeline.png) | ![Timeline](screenshots/demo/google-timeline.png) |
+| ![Viewer](screenshots/demo/apple-viewer.png) | ![Viewer](screenshots/demo/google-viewer.png) |
+
 ## Build steps
 
 1. Clone project with `git clone --recurse git@github.com:picajoso/Immich-Android-TV.git`
