@@ -108,6 +108,27 @@ class ApiClient(private val config: ApiClientConfig) {
     }
     // ------------------------------------------------
 
+    sealed class Conditional<out T> {
+        object NotModified : Conditional<Nothing>()
+        class Fresh<T>(val body: T, val etag: String?) : Conditional<T>()
+        class Failed(val message: String) : Conditional<Nothing>()
+    }
+
+    /**
+     * Albums, asking the server first whether they changed since [etag]: an unchanged list costs a
+     * few bytes (HTTP 304) instead of megabytes.
+     */
+    suspend fun albumsIfChanged(shared: Boolean, etag: String?): Conditional<List<Album>> = try {
+        val res = service.listAlbumsRaw(shared, etag)
+        when {
+            res.code() == 304 -> Conditional.NotModified
+            res.isSuccessful && res.body() != null -> Conditional.Fresh(res.body()!!, res.headers()["ETag"])
+            else -> Conditional.Failed("HTTP ${res.code()}")
+        }
+    } catch (e: Exception) {
+        Conditional.Failed(e.message ?: "error")
+    }
+
     /** Albums owned by the user. */
     suspend fun listMyAlbums(): Either<String, List<Album>> = executeAPICall(200) { service.listAlbums() }
 

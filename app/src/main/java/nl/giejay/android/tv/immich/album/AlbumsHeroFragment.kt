@@ -38,6 +38,8 @@ import nl.giejay.android.tv.immich.shared.prefs.ALBUMS_SORTING
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.shared.prefs.UiStyle
 import nl.giejay.android.tv.immich.shared.util.currentApiClient
+import nl.giejay.android.tv.immich.shared.cache.SwrCache
+import nl.giejay.android.tv.immich.api.ApiClient
 import nl.giejay.android.tv.immich.ui.FocusCardView
 import nl.giejay.android.tv.immich.ui.UiFormat
 import nl.giejay.android.tv.immich.ui.UiStyleProvider
@@ -197,31 +199,54 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
         albums.filter { it.assetCount > 0 && it.albumThumbnailAssetId != null }
             .maxByOrNull { (it.endDate ?: it.updatedAt).time }
 
+    /**
+     * Cached albums are shown at once; the server is then asked (with the ETag of the cached copy)
+     * whether anything changed, and the screen is only redrawn when it did.
+     */
     private fun loadAlbums() {
         val client = currentApiClient() ?: return
         viewLifecycleOwner.lifecycleScope.launch {
-            val mine = withContext(Dispatchers.IO) { client.listMyAlbums() }
-            val mineList = mine.getOrNull()
-            if (mineList == null) {
-                Timber.e("Could not load albums")
-                return@launch
+            val cachedMine = SwrCache.readList<Album>("albums_mine")
+            val cachedShared = SwrCache.readList<Album>("albums_shared")
+            var mine: List<Album> = cachedMine?.first ?: emptyList()
+            var shared: List<Album> = cachedShared?.first ?: emptyList()
+            if (cachedMine != null) present(mine, shared, firstTime = true)
+
+            val resMine = withContext(Dispatchers.IO) { client.albumsIfChanged(false, cachedMine?.second) }
+            when (resMine) {
+                is ApiClient.Conditional.Fresh -> {
+                    val changed = resMine.body != mine
+                    mine = resMine.body
+                    withContext(Dispatchers.IO) { SwrCache.writeList("albums_mine", mine, resMine.etag) }
+                    if (changed) present(mine, shared, firstTime = cachedMine == null)
+                }
+                is ApiClient.Conditional.NotModified -> {}
+                is ApiClient.Conditional.Failed -> Timber.e("Could not load albums: ${resMine.message}")
             }
-            val apple = appleView
-            if (apple != null) {
-                // Apple: own albums show up as soon as they arrive, the (slower) shared list follows
-                apple.setMyAlbums(sortAlbums(mineList))
-                latestOf(mineList)?.let { apple.showHero(it) }
-                val shared = withContext(Dispatchers.IO) { client.listSharedAlbums() }
-                val mineIds = mineList.map { it.id }.toSet()
-                shared.getOrNull()?.let { list -> appleView?.setSharedAlbums(sortAlbums(list.filter { it.id !in mineIds })) }
-            } else {
-                // Google TV: one row, own albums first, then the shared ones not already in it
-                showGoogleAlbums(sortAlbums(mineList))
-                val shared = withContext(Dispatchers.IO) { client.listSharedAlbums() }
-                val mineIds = mineList.map { it.id }.toSet()
-                val extra = shared.getOrNull()?.filter { it.id !in mineIds }.orEmpty()
-                if (extra.isNotEmpty() && isAdded) showGoogleAlbums(sortAlbums(mineList + extra))
+            if (mine.isEmpty()) return@launch
+
+            // the shared list (a second, equally big call on servers without shared albums) follows
+            val resShared = withContext(Dispatchers.IO) { client.albumsIfChanged(true, cachedShared?.second) }
+            if (resShared is ApiClient.Conditional.Fresh) {
+                val changed = resShared.body != shared
+                shared = resShared.body
+                withContext(Dispatchers.IO) { SwrCache.writeList("albums_shared", shared, resShared.etag) }
+                if (changed) present(mine, shared, firstTime = false)
             }
+        }
+    }
+
+    private fun present(mine: List<Album>, shared: List<Album>, firstTime: Boolean) {
+        if (!isAdded || view == null) return
+        val mineIds = mine.map { it.id }.toSet()
+        val extra = shared.filter { it.id !in mineIds }
+        val apple = appleView
+        if (apple != null) {
+            apple.setMyAlbums(sortAlbums(mine))
+            latestOf(mine)?.let { apple.showHero(it) }
+            apple.setSharedAlbums(sortAlbums(extra))
+        } else {
+            showGoogleAlbums(sortAlbums(mine + extra))
         }
     }
 

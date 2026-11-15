@@ -29,6 +29,7 @@ import nl.giejay.android.tv.immich.api.model.Bucket
 import nl.giejay.android.tv.immich.api.util.ApiUtil
 import nl.giejay.android.tv.immich.shared.prefs.PhotosOrder
 import nl.giejay.android.tv.immich.shared.util.currentApiClient
+import nl.giejay.android.tv.immich.shared.cache.SwrCache
 import nl.giejay.android.tv.immich.ui.FocusCardView
 import nl.giejay.android.tv.immich.ui.FocusRowView
 import nl.giejay.android.tv.immich.ui.UiFormat
@@ -68,6 +69,8 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
     private var years: List<Int> = emptyList()
     private var selectedYear: Int? = null
     private val covers = mutableMapOf<String, String>()
+    /** "2026-3" -> "assetId:count", kept between visits; a cover is asked again when the month's count changed */
+    private val coverStore: MutableMap<String, String> by lazy { SwrCache.readCounts("timeline_covers") }
 
     override fun getMainFragmentAdapter(): BrowseSupportFragment.MainFragmentAdapter<TimelineOverviewFragment> {
         return mMainFragmentAdapter
@@ -177,12 +180,22 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
     private fun loadBuckets() {
         val client = currentApiClient() ?: return
         viewLifecycleOwner.lifecycleScope.launch {
+            // cached buckets first, then the server decides whether anything changed
+            val cached = SwrCache.readList<Bucket>("timeline_buckets")?.first
+            if (cached != null) {
+                buckets = cached
+                showYears()
+            }
             val result = withContext(Dispatchers.IO) { client.listBuckets("", PhotosOrder.NEWEST_OLDEST) }
             result.fold(
                 { Timber.e("Could not load buckets: $it") },
                 { list ->
-                    buckets = list
-                    showYears()
+                    if (list != cached) {
+                        withContext(Dispatchers.IO) { SwrCache.writeList("timeline_buckets", list) }
+                        buckets = list
+                        // keep the selected year (and the focus) when only counts changed
+                        selectedYear?.let { y -> selectedYear = null; showYears(keepYear = y) } ?: showYears()
+                    }
                 }
             )
         }
@@ -196,7 +209,7 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
         return y to m
     }
 
-    private fun showYears() {
+    private fun showYears(keepYear: Int? = null) {
         if (!isAdded || view == null) return
         val perYear = buckets.mapNotNull { b -> parseYearMonth(b.timeBucket)?.let { it.first to b.count } }
             .groupBy({ it.first }, { it.second })
@@ -208,7 +221,7 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
         adapter.addAll(0, years)
         yearAdapter = adapter
         yearsGrid.adapter = ItemBridgeAdapter(adapter)
-        years.firstOrNull()?.let { selectYear(it) }
+        (keepYear?.takeIf { it in years } ?: years.firstOrNull())?.let { selectYear(it) }
     }
 
     private fun selectYear(year: Int) {
@@ -227,7 +240,7 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
             .associateBy({ it.second }, { it.third })
         val cells = (1..12).map { m ->
             val b = byMonth[m]
-            MonthCell(year, m, b?.count ?: 0, b?.timeBucket, covers["$year-$m"])
+            MonthCell(year, m, b?.count ?: 0, b?.timeBucket, covers["$year-$m"] ?: coverStore["$year-$m"]?.substringBefore(":"))
         }
         monthAdapter.clear()
         monthAdapter.addAll(0, cells)
@@ -236,11 +249,13 @@ class TimelineOverviewFragment : Fragment(), BrowseSupportFragment.MainFragmentA
 
     private fun loadCovers(year: Int, cells: List<MonthCell>) {
         val client = currentApiClient() ?: return
-        cells.filter { it.count > 0 && it.coverAssetId == null }.forEach { cell ->
+        cells.filter { it.count > 0 && (it.coverAssetId == null || coverStore["${it.year}-${it.month}"]?.substringAfter(":") != it.count.toString()) }.forEach { cell ->
             viewLifecycleOwner.lifecycleScope.launch {
                 val res = withContext(Dispatchers.IO) { client.firstAssetOfMonth(cell.year, cell.month) }
                 val id = res.getOrNull()?.id ?: return@launch
                 covers["${cell.year}-${cell.month}"] = id
+                coverStore["${cell.year}-${cell.month}"] = "$id:${cell.count}"
+                withContext(Dispatchers.IO) { SwrCache.writeMap("timeline_covers", coverStore) }
                 cell.coverAssetId = id
                 if (selectedYear == year && this@TimelineOverviewFragment::monthAdapter.isInitialized) {
                     val idx = monthAdapter.indexOf(cell)

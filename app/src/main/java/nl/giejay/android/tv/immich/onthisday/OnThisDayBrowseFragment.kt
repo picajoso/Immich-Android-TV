@@ -50,14 +50,18 @@ class OnThisDayBrowseFragment : PhotoRowsFragment() {
             }
         )
 
-        val assets = client.onThisDayAssets(1, 1000, PreferenceManager.get(FILTER_CONTENT_TYPE), yearsBack)
+        // today's result does not change until tomorrow: cached per day and content filter
+        val today = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+        val cacheKey = "onthisday_${today}_${PreferenceManager.get(FILTER_CONTENT_TYPE)}"
+        val cachedAssets = nl.giejay.android.tv.immich.shared.cache.SwrCache.readList<Asset>(cacheKey)?.first
+        val assets = cachedAssets ?: client.onThisDayAssets(1, 1000, PreferenceManager.get(FILTER_CONTENT_TYPE), yearsBack)
             .fold(
                 { error ->
                     Timber.e("Error loading 'On this day' assets: $error")
                     emptyList<Asset>()
                 },
                 { it }
-            )
+            ).also { if (it.isNotEmpty()) nl.giejay.android.tv.immich.shared.cache.SwrCache.writeList(cacheKey, it) }
         val byYear = assets.groupBy { yearOf(it) }
 
         return (0..yearsBack).mapNotNull { offset ->

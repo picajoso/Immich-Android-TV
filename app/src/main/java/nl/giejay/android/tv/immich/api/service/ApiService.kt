@@ -32,6 +32,13 @@ interface ApiService {
     @GET("people")
     suspend fun listPeople(): Response<PeopleResponse>
 
+    /** Same as [listAlbums] but exposing the headers and accepting a "304 not modified" (ETag). */
+    @GET("albums")
+    suspend fun listAlbumsRaw(
+        @Query("shared") shared: Boolean = false,
+        @retrofit2.http.Header("If-None-Match") ifNoneMatch: String? = null
+    ): Response<List<Album>>
+
     @GET("albums/{albumId}")
     suspend fun listAssetsFromAlbum(@Path("albumId") albumId: String?): Response<AlbumDetails>
 

@@ -27,6 +27,7 @@ import nl.giejay.android.tv.immich.api.model.Person
 import nl.giejay.android.tv.immich.api.util.ApiUtil
 import nl.giejay.android.tv.immich.home.HomeFragmentDirections
 import nl.giejay.android.tv.immich.shared.util.currentApiClient
+import nl.giejay.android.tv.immich.shared.cache.SwrCache
 import nl.giejay.android.tv.immich.ui.FocusCardView
 import nl.giejay.android.tv.immich.ui.UiStyleProvider
 import nl.giejay.android.tv.immich.ui.UiTokens
@@ -116,10 +117,17 @@ class PeopleFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterProv
     private fun load() {
         val client = currentApiClient() ?: return
         viewLifecycleOwner.lifecycleScope.launch {
+            val cached = SwrCache.readList<Person>("people")?.first
+            if (cached != null) showPeople(cached)
             val result = withContext(Dispatchers.IO) { client.listPeople() }
             result.fold(
                 { Timber.e("Could not load people: $it") },
-                { people -> showPeople(people) }
+                { people ->
+                    if (people != cached) {
+                        withContext(Dispatchers.IO) { SwrCache.writeList("people", people) }
+                        showPeople(people)
+                    }
+                }
             )
         }
     }
@@ -128,14 +136,22 @@ class PeopleFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterProv
         if (!isAdded || view == null) return
         peopleCount.text = nl.giejay.android.tv.immich.shared.util.Tr.people(people.size)
         val client = currentApiClient()
+        // photo counts survive between visits; a count is refreshed once per session
+        val stored = SwrCache.readCounts("person_counts")
         val counts = mutableMapOf<java.util.UUID, Int>()
+        stored.forEach { (k, v) -> v.toIntOrNull()?.let { n -> runCatching { counts[java.util.UUID.fromString(k)] = n } } }
         val asked = mutableSetOf<java.util.UUID>()
         val p = PersonCardPresenter(tokens, counts, { person, done ->
             // photo count per person, asked for the visible cards only
             if (client != null && asked.add(person.id)) {
+                counts[person.id]?.let { done(it) }
                 viewLifecycleOwner.lifecycleScope.launch {
                     val res = withContext(Dispatchers.IO) { client.personStatistics(person.id.toString()) }
-                    res.getOrNull()?.let { counts[person.id] = it.assets; done(it.assets) }
+                    res.getOrNull()?.let {
+                        counts[person.id] = it.assets
+                        done(it.assets)
+                        withContext(Dispatchers.IO) { SwrCache.writeMap("person_counts", counts.mapKeys { e -> e.key.toString() }.mapValues { e -> e.value.toString() }) }
+                    }
                 }
             }
         }) { person ->
@@ -234,11 +250,10 @@ private class PersonCardPresenter(
         p.name.setTextColor(if (named) tokens.text else tokens.accent)
         val known = counts[person.id]
         p.count.text = if (known != null) photos(known) else ""
-        if (known == null) {
-            loadCount(person) { n ->
-                // the view may have been recycled for another person meanwhile
-                if (p.personId == person.id) p.count.text = photos(n)
-            }
+        // the stored count shows at once; the loader refreshes it once per session
+        loadCount(person) { n ->
+            // the view may have been recycled for another person meanwhile
+            if (p.personId == person.id) p.count.text = photos(n)
         }
         Glide.with(p.image).load(ApiUtil.getPersonThumbnail(person.id)).centerCrop().into(p.image)
         p.cover.setOnClickListener { onClicked(person) }

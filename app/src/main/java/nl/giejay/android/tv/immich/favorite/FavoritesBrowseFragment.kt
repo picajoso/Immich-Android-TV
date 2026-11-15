@@ -15,6 +15,7 @@ import nl.giejay.android.tv.immich.shared.prefs.FILTER_CONTENT_TYPE
 import nl.giejay.android.tv.immich.shared.prefs.GRID_COLUMN_COUNT
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import timber.log.Timber
+import nl.giejay.android.tv.immich.shared.cache.SwrCache
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -133,18 +134,41 @@ class FavoritesBrowseFragment : GenericAssetFragment() {
         }
     }
 
+    /** True while the first page is being re-read from the server after the cached one was shown. */
+    private var revalidated = false
+
     override suspend fun loadItems(
         apiClient: ApiClient,
         page: Int,
         pageCount: Int
     ): Either<String, List<Asset>> {
-        // TEMPORAL: Forzar cargar 100 elementos
-        Timber.d("Favorites: Cargando página $page con tamaño 100")
-        return apiClient.listFavoriteAssets(
-            page,
-            100,  // ← Cambiar de pageCount a 100
-            currentFilter
-        )
+        val key = "favorites_p1_${currentFilter}"
+        if (page == 1 && !revalidated) {
+            // cached first page at once, the server is asked behind the scenes
+            val cached = SwrCache.readList<Asset>(key)?.first
+            if (cached != null && cached.isNotEmpty()) {
+                ioScope.launch {
+                    apiClient.listFavoriteAssets(1, 100, currentFilter).getOrNull()?.let { fresh ->
+                        if (fresh.map { it.id } != cached.map { it.id }) {
+                            SwrCache.writeList(key, fresh)
+                            withContext(Dispatchers.Main) {
+                                if (isAdded) {
+                                    revalidated = true
+                                    clearState()
+                                    allPagesLoaded = false
+                                    fetchInitialItems()
+                                }
+                            }
+                        }
+                    }
+                }
+                return Either.Right(cached)
+            }
+        }
+        revalidated = false
+        val result = apiClient.listFavoriteAssets(page, 100, currentFilter)
+        if (page == 1) result.getOrNull()?.let { SwrCache.writeList(key, it) }
+        return result
     }
     override fun sortItems(items: List<Asset>): List<Asset> {
         return items.sortedWith(currentSort.sort)
