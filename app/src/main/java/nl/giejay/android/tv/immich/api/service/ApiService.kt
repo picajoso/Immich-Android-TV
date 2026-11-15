@@ -53,6 +53,9 @@ interface ApiService {
     @GET("assets/{id}")
     suspend fun getAsset(@Path("id") id: String): Response<Asset>
 
+    @GET("people/{id}/statistics")
+    suspend fun personStatistics(@Path("id") id: String): Response<nl.giejay.android.tv.immich.api.model.PersonStatistics>
+
     @GET("users/me")
     suspend fun currentUser(): Response<nl.giejay.android.tv.immich.api.model.UserMe>
 

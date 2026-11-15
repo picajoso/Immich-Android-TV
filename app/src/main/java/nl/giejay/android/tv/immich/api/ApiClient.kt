@@ -75,6 +75,11 @@ class ApiClient(private val config: ApiClientConfig) {
         return executeAPICall(200) { service.getAsset(id) }
     }
 
+    /** Number of photos of one person (People cards; requested for the visible cards only). */
+    suspend fun personStatistics(personId: String): Either<String, nl.giejay.android.tv.immich.api.model.PersonStatistics> {
+        return executeAPICall(200) { service.personStatistics(personId) }
+    }
+
     /** The signed-in user (name shown in the Google TV drawer). */
     suspend fun currentUser(): Either<String, nl.giejay.android.tv.immich.api.model.UserMe> {
         return executeAPICall(200) { service.currentUser() }
