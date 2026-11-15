@@ -15,6 +15,10 @@ import nl.giejay.android.tv.immich.shared.prefs.FILTER_CONTENT_TYPE
 import nl.giejay.android.tv.immich.shared.prefs.GRID_COLUMN_COUNT
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import timber.log.Timber
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FavoritesBrowseFragment : GenericAssetFragment() {
     override val gridTitle: String? = "Favorites"
@@ -55,6 +59,20 @@ class FavoritesBrowseFragment : GenericAssetFragment() {
         }
     }
     
+    override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // "231 photos" + Slideshow before the date pill (googletv-11)
+        setHeaderAction("Slideshow", android.R.drawable.ic_media_play, null) { startSlideshow() }
+        val client = nl.giejay.android.tv.immich.shared.util.currentApiClient() ?: return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val stats = withContext(Dispatchers.IO) { client.assetStatistics(isFavorite = true) }
+            stats.getOrNull()?.let { st ->
+                setHeaderAction("Slideshow", android.R.drawable.ic_media_play,
+                    "${nl.giejay.android.tv.immich.ui.UiFormat.count(st.total)} photos") { startSlideshow() }
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         

@@ -86,8 +86,8 @@ class ApiClient(private val config: ApiClientConfig) {
     }
 
     /** Number of images / videos in the library (side menu counter). */
-    suspend fun assetStatistics(): Either<String, nl.giejay.android.tv.immich.api.model.AssetStatistics> {
-        return executeAPICall(200) { service.assetStatistics() }
+    suspend fun assetStatistics(isFavorite: Boolean? = null): Either<String, nl.giejay.android.tv.immich.api.model.AssetStatistics> {
+        return executeAPICall(200) { service.assetStatistics(isFavorite) }
     }
 
     suspend fun toggleFavorite(assetId: String, isFavorite: Boolean): Either<String, Asset> {

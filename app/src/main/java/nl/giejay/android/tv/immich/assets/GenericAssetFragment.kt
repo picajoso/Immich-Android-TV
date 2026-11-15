@@ -280,6 +280,13 @@ abstract class GenericAssetFragment : VerticalCardGridFragment<Asset>() {
         )
     }
 
+    /** Opens the viewer on the first photo and starts the slideshow (Favorites: "Slideshow"). */
+    protected fun startSlideshow() {
+        val first = adapter.get(0) as? Card ?: return
+        nl.giejay.mediaslider.config.MediaSliderConfiguration.autoStartSlideshow = true
+        onItemClicked(first)
+    }
+
     override fun onItemClicked(card: Card) {
         val toSliderItems = assets.toSliderItems(keepOrder = true, mergePortrait = false)
         val loadMore: LoadMore = suspend {

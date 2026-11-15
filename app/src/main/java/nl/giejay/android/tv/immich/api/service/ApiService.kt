@@ -60,7 +60,7 @@ interface ApiService {
     suspend fun currentUser(): Response<nl.giejay.android.tv.immich.api.model.UserMe>
 
     @GET("assets/statistics")
-    suspend fun assetStatistics(): Response<nl.giejay.android.tv.immich.api.model.AssetStatistics>
+    suspend fun assetStatistics(@Query("isFavorite") isFavorite: Boolean? = null): Response<nl.giejay.android.tv.immich.api.model.AssetStatistics>
 
     @GET("view/folder/unique-paths")
     suspend fun getUniquePaths(): Response<List<String>>
