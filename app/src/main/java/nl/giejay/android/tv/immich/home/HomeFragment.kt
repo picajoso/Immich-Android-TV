@@ -21,10 +21,8 @@ import androidx.leanback.widget.SectionRow
 import nl.giejay.android.tv.immich.album.AlbumsHeroFragment
 import nl.giejay.android.tv.immich.assets.TimelineOverviewFragment
 import nl.giejay.android.tv.immich.assets.AllAssetFragment
-import nl.giejay.android.tv.immich.assets.FolderFragment
 import nl.giejay.android.tv.immich.assets.RandomAssetsFragment
 import nl.giejay.android.tv.immich.assets.RecentAssetsFragment
-import nl.giejay.android.tv.immich.assets.SeasonalFragment
 import nl.giejay.android.tv.immich.assets.TimelineFragment
 import nl.giejay.android.tv.immich.onthisday.OnThisDayBrowseFragment
 import nl.giejay.android.tv.immich.favorite.FavoritesBrowseFragment
@@ -342,12 +340,12 @@ class HomeFragment : BrowseSupportFragment() {
         /** Apple: two labelled groups, Settings is appended after them. */
         private val APPLE_GROUPS: List<Pair<String, List<String>>> = listOf(
             "Library" to listOf("Photos", "Albums", "People", "Favorites", "Recent", "Random"),
-            "Collections" to listOf("On this day", "Seasonal", "Timeline", "Folders", "Edit")
+            "Collections" to listOf("On this day", "Timeline", "Edit")
         )
 
         /** Google TV: one flat list (no group labels), in the order of the mockup. */
         private val GOOGLE_GROUPS: List<Pair<String, List<String>>> = listOf(
-            "" to listOf("Photos", "Albums", "Random", "People", "Recent", "Favorites", "On this day", "Seasonal", "Timeline", "Folders", "Edit")
+            "" to listOf("Photos", "Albums", "Random", "People", "Recent", "Favorites", "On this day", "Timeline", "Edit")
         )
 
         private val GROUPS: List<Pair<String, List<String>>>
@@ -364,9 +362,7 @@ class HomeFragment : BrowseSupportFragment() {
             Header("Recent") { RecentAssetsFragment() },
             Header("Favorites") { FavoritesBrowseFragment() },
             Header("On this day") { OnThisDayBrowseFragment() }, // CAMBIADO AQUÍ
-            Header("Seasonal") { SeasonalFragment() },
             Header("Timeline") { TimelineOverviewFragment() },
-            Header("Folders") { FolderFragment() },
             Header("Edit") { EditMenuFragment() },
             Header("Settings") { SettingsFragment() },
         )
