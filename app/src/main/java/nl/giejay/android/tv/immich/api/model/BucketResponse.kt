@@ -14,8 +14,19 @@ data class BucketResponse(
     val originalFileName: List<String?>?,
     // El JSON tiene city y country, los usaremos para crear un Exif parcial
     val city: List<String?>?,
-    val country: List<String?>?
+    val country: List<String?>?,
+    // UTC time the photo was taken, e.g. "2026-02-28T23:47:50.438"; drives the date pill of the grids
+    val fileCreatedAt: List<String?>? = null
 ) {
+    private fun takenAt(index: Int): java.util.Date? {
+        val text = fileCreatedAt?.getOrNull(index) ?: return null
+        return try {
+            java.util.Date.from(java.time.LocalDateTime.parse(text).toInstant(java.time.ZoneOffset.UTC))
+        } catch (e: java.time.format.DateTimeParseException) {
+            null
+        }
+    }
+
     fun toAssets(): List<Asset> {
         val assets = mutableListOf<Asset>()
         val count = id.size
@@ -28,7 +39,8 @@ data class BucketResponse(
             val cityVal = city?.getOrNull(i)
             val countryVal = country?.getOrNull(i)
             
-            val exif = if (cityVal != null || countryVal != null) {
+            val taken = takenAt(i)
+            val exif = if (cityVal != null || countryVal != null || taken != null) {
                 AssetExifInfo(
                     description = null,
                     orientation = null,
@@ -36,7 +48,7 @@ data class BucketResponse(
                     exifImageHeight = null,
                     city = cityVal,
                     country = countryVal,
-                    dateTimeOriginal = null,
+                    dateTimeOriginal = taken,
                     make = null,
                     model = null
                 )

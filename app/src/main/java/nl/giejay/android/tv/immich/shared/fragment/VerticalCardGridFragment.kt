@@ -88,6 +88,9 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
     /** Title shown in the header of a photo grid. */
     protected open val photoGridTitle: String get() = ""
 
+    /** Small line above the title ("Timeline > 2026"); null for none. */
+    protected open val photoGridBreadcrumb: String? get() = null
+
     override val hideBrandedTitle: Boolean get() = usePhotoTiles
 
     private var photoTilePresenter: PhotoTilePresenter? = null
@@ -336,12 +339,20 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
                 }
             }
         }.also {
+            // grids that are not a page of the home browse have no menu next to them
+            menuShown = hostedInBrowse
             it.menuShown = menuShown
             it.attach()
         }
     }
 
     private var photoGridLayout: PhotoGridLayout? = null
+
+    /**
+     * The side menu only exists while this grid is a page of the home browse (Photos, Random...).
+     * Grids opened on their own (the month view) are full screen.
+     */
+    private val hostedInBrowse: Boolean get() = parentFragment is androidx.leanback.app.BrowseSupportFragment
     private var menuShown: Boolean = true
 
     override fun onMenuVisibilityChanged(menuShown: Boolean) {
@@ -361,14 +372,17 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         val context = root.context
         val header = root.findViewById<View>(R.id.grid_header) ?: return
         val title = root.findViewById<TextView>(R.id.grid_title) ?: return
-        val compact = !menuShown
-        val hidden = if (menuShown) UiStyleProvider.dp(context, tokens.sidebarWidthDp) else 0
+        val standalone = !hostedInBrowse
+        val compact = !menuShown && !standalone
+        val hidden = if (menuShown && !standalone) UiStyleProvider.dp(context, tokens.sidebarWidthDp) else 0
+        // standalone (month view, mockup apple-07): 48px top, 64px title, 30px below
+        val top = if (standalone) 24 else if (compact) tokens.contentPaddingTopCompactDp else tokens.contentPaddingTopDp
+        val gap = if (compact) tokens.headerGapCompactDp else tokens.headerGapDp
         header.setPadding(
             UiStyleProvider.dp(context, tokens.contentPaddingHDp),
-            UiStyleProvider.dp(context, if (compact) tokens.contentPaddingTopCompactDp else tokens.contentPaddingTopDp),
+            UiStyleProvider.dp(context, top),
             UiStyleProvider.dp(context, tokens.contentPaddingHDp) + hidden,
-            (UiStyleProvider.dp(context, if (compact) tokens.headerGapCompactDp else tokens.headerGapDp) -
-                PhotoGridLayout.focusRoomPx(context, tokens)).coerceAtLeast(0)
+            (UiStyleProvider.dp(context, gap) - PhotoGridLayout.focusRoomPx(context, tokens)).coerceAtLeast(0)
         )
         title.textSize = if (compact) tokens.titleCompactSizeSp else tokens.titleSizeSp
         lineHeightOne(title)
@@ -401,6 +415,15 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         header.visibility = View.VISIBLE
         title.text = photoGridTitle
         UiStyleProvider.applyTitle(title, tokens)
+        root.findViewById<TextView>(R.id.grid_breadcrumb)?.let { crumb ->
+            val text = photoGridBreadcrumb
+            crumb.visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
+            crumb.text = text
+            crumb.includeFontPadding = false
+            UiStyleProvider.applyBody(crumb, tokens, 13f, tokens.dim)
+            // mockup: the right group sits on the title's baseline when there is a breadcrumb
+            if (!text.isNullOrEmpty()) (header as? android.widget.LinearLayout)?.gravity = android.view.Gravity.BOTTOM
+        }
         // line-height 1 like the mockup's h2
         title.includeFontPadding = false
         pill.includeFontPadding = false

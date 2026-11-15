@@ -27,41 +27,27 @@
                     android:gravity="center_vertical"
                     android:visibility="gone">
 
-                <TextView
-                        android:id="@+id/grid_title"
+                <!-- title with an optional breadcrumb above it ("Timeline > 2026") -->
+                <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:singleLine="true"
-                        android:focusable="false" />
-
-                <!-- optional header actions (month view: previous / next month) -->
-                <LinearLayout
-                        android:id="@+id/grid_header_actions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginEnd="12dp"
-                        android:visibility="gone">
+                        android:orientation="vertical">
 
                     <TextView
-                            android:id="@+id/grid_action_prev"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:singleLine="true"
-                            android:focusable="true"
-                            android:clickable="true"
-                            android:visibility="gone" />
-
-                    <TextView
-                            android:id="@+id/grid_action_next"
+                            android:id="@+id/grid_breadcrumb"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:singleLine="true"
-                            android:focusable="true"
-                            android:clickable="true"
+                            android:focusable="false"
                             android:visibility="gone" />
+
+                    <TextView
+                            android:id="@+id/grid_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:focusable="false" />
                 </LinearLayout>
 
                 <TextView
@@ -71,6 +57,35 @@
                         android:singleLine="true"
                         android:focusable="false"
                         android:visibility="invisible" />
+
+                <!-- optional header actions (month view: previous / next month) -->
+                <LinearLayout
+                        android:id="@+id/grid_header_actions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                    <TextView
+                            android:id="@+id/grid_action_prev"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:singleLine="true"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:visibility="gone" />
+
+                    <TextView
+                            android:id="@+id/grid_action_next"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:singleLine="true"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:visibility="gone" />
+                </LinearLayout>
             </LinearLayout>
 
             <FrameLayout

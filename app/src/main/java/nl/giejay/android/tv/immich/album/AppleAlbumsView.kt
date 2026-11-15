@@ -26,7 +26,6 @@ import nl.giejay.android.tv.immich.ui.FocusCardView
 import nl.giejay.android.tv.immich.ui.UiStyleProvider
 import nl.giejay.android.tv.immich.ui.UiTokens
 import timber.log.Timber
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -171,7 +170,7 @@ class AppleAlbumsView(
     }
 
     private fun photoCount(count: Int): String =
-        "${NumberFormat.getIntegerInstance().format(count)} ${if (count == 1) "photo" else "photos"}"
+        "${nl.giejay.android.tv.immich.ui.UiFormat.count(count)} ${if (count == 1) "photo" else "photos"}"
 
     private fun cardPresenter(row: () -> Int) = object : Presenter() {
         override fun onCreateViewHolder(parent: ViewGroup): ViewHolder = ViewHolder(AlbumCard(parent.context))

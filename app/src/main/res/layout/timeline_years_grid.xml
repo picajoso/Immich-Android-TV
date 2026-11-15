@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Years column of the Timeline: RIGHT leaves it for the months, LEFT for the side menu.
+     Programmatic grids do not get the side focus-out of the Leanback styles. -->
+<androidx.leanback.widget.VerticalGridView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    app:focusOutSideStart="true"
+    app:focusOutSideEnd="true" />

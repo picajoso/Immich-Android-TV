@@ -66,12 +66,12 @@ class HomeFragment : BrowseSupportFragment() {
         super.onViewCreated(view, savedInstanceState)
         spacerListenerAdded = false
         headersSupportFragment.setOnHeaderViewSelectedListener { _, row ->
-            title = row?.headerItem?.name ?: "-"
             selectedPosition = row?.let { mRowsAdapter.indexOf(it) } ?: 0
         }
 
         setupEdgeHint(view)
         styleHeaders()
+
         loadMenuCounters()
 
         if (savedInstanceState == null) {
@@ -157,7 +157,7 @@ class HomeFragment : BrowseSupportFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val stats = withContext(Dispatchers.IO) { client.assetStatistics() }
             stats.getOrNull()?.let {
-                val text = java.text.NumberFormat.getIntegerInstance().format(it.total)
+                val text = nl.giejay.android.tv.immich.ui.UiFormat.count(it.total)
                 ImmichRowPresenter.counts["Photos"] = text
                 pageRows["Photos"]?.let { row ->
                     val index = mRowsAdapter.indexOf(row)
@@ -186,7 +186,9 @@ class HomeFragment : BrowseSupportFragment() {
         isHeadersTransitionOnBackEnabled = true
         // sidebar background of the active interface style
         brandColor = UiStyleProvider.current().sidebar
-        title = "Photos"
+        // every page draws its own title: Leanback's one (top right, animated over the content)
+        // stays empty
+        title = ""
 
         val sHeaderPresenter: PresenterSelector = ClassPresenterSelector()
             .addClassPresenter(DividerRow::class.java, DividerPresenter())

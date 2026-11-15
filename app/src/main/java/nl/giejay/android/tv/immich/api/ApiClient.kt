@@ -56,7 +56,9 @@ class ApiClient(private val config: ApiClientConfig) {
         }
         // ---------------------------
 
-        val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+        // Immich 3.x rejects datetimes without an offset (HTTP 400, "expected ISO 8601 datetime"); the
+        // search dates are UTC, like the time buckets ("2026-11-01T00:00:00.000Z")
+        val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
     }
 
     private val retrofit = Retrofit.Builder()

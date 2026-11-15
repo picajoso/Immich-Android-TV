@@ -37,9 +37,12 @@ class TimelineFragment : GenericAssetFragment() {
 
     private var currentBucket: Bucket? = null
 
-    /** Month view: continuous grid titled with the month ("November 2026"). */
+    /** Month view: continuous grid titled with the month ("October"), year in the breadcrumb. */
     override val gridTitle: String?
-        get() = monthLabel(arguments?.getString("timeBucket"), "MMMMyyyy") ?: "Timeline"
+        get() = monthLabel(arguments?.getString("timeBucket"), "MMMM")?.replaceFirstChar { it.titlecase() } ?: "Timeline"
+
+    override val photoGridBreadcrumb: String?
+        get() = arguments?.getString("timeBucket")?.takeIf { it.length >= 4 }?.let { "Timeline \u203A ${it.substring(0, 4)}" }
 
     private fun monthLabel(timeBucket: String?, skeleton: String): String? {
         if (timeBucket == null || timeBucket.length < 7) return null
@@ -94,10 +97,12 @@ class TimelineFragment : GenericAssetFragment() {
         val ctx = button.context
         val name = monthLabel(timeBucket, "MMM") ?: return
         button.text = if (prefix != null) prefix + name else "$name \u203A"
-        UiStyleProvider.applyBody(button, tokens, tokens.bodySizeSp, tokens.text)
+        UiStyleProvider.applyBody(button, tokens, tokens.bodySizeSp, tokens.text2)
+        button.includeFontPadding = false
         fun pill(stroke: Boolean) = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = UiStyleProvider.dp(ctx, 500).toFloat()
+            // mockup: 14px corners (Apple), fully rounded in Google TV
+            cornerRadius = UiStyleProvider.dp(ctx, if (tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.APPLE) 7 else 500).toFloat()
             setColor(tokens.pillBg)
             if (stroke) setStroke(UiStyleProvider.dp(ctx, 2f), tokens.focusRing)
         }
@@ -105,7 +110,7 @@ class TimelineFragment : GenericAssetFragment() {
             addState(intArrayOf(android.R.attr.state_focused), pill(true))
             addState(intArrayOf(), pill(false))
         }
-        button.setPadding(UiStyleProvider.dp(ctx, 12), UiStyleProvider.dp(ctx, 6), UiStyleProvider.dp(ctx, 12), UiStyleProvider.dp(ctx, 6))
+        button.setPadding(UiStyleProvider.dp(ctx, 11), UiStyleProvider.dp(ctx, 6), UiStyleProvider.dp(ctx, 11), UiStyleProvider.dp(ctx, 6))
         button.visibility = View.VISIBLE
         button.setOnClickListener {
             findNavController().navigate(
