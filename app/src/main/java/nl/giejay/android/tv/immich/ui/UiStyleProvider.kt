@@ -206,11 +206,14 @@ object UiStyleProvider {
             bodyTypeface = bodyTypeface(t)
         )
         UiStyle.GOOGLE_TV -> ViewerStyle(
-            pillBg = 0xEB1F2024.toInt(),
+            pillBg = 0xF02B2C31.toInt(),
             pillStroke = 0,
             pillText = 0xFFFFFFFF.toInt(),
             pillTextDim = t.dim,
             pillSeparator = t.dim,
+            pillTextSp = 13f,
+            pillPadVDp = 9.5f,
+            pillShowSeparator = false,
             panelBg = 0xFF1F2024.toInt(),
             panelStroke = 0,
             panelWidthDp = 270,
@@ -221,7 +224,7 @@ object UiStyleProvider {
             panelHeading = true,
             text = t.text,
             dim = t.dim,
-            iconTint = t.dim,
+            iconTint = t.accent,
             cardBlocks = true,
             blockBg = t.pillBg,
             blockCornerDp = 9f,
@@ -230,8 +233,11 @@ object UiStyleProvider {
             secondaryBg = t.pillBg,
             secondaryText = t.text,
             focusRing = 0,
-            photoInsetDp = 0,
+            photoInsetDp = 20,
+            photoGapDp = 0,
+            photoCornerDp = 8f,
             buttonCornerDp = 36f,
+            buttonHeightDp = 36,
             titleTypeface = titleTypeface(t),
             bodyTypeface = bodyTypeface(t)
         )
