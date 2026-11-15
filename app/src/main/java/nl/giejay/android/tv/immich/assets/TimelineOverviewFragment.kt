@@ -287,20 +287,25 @@ private class YearPresenter(
 
         // mockup: the selected year is a filled row with a big bold year, the others are plain
         val selected = selectedYear() == y
+        val google = tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.GOOGLE_TV
+        val countView = parts[1] as TextView
         val padV = if (selected) 8 else 6
         row.setPadding(UiStyleProvider.dp(ctx, 12), UiStyleProvider.dp(ctx, padV), UiStyleProvider.dp(ctx, 12), UiStyleProvider.dp(ctx, padV))
+        // Apple: translucent filled row; Google TV: a white pill with dark text
         row.background = if (selected) GradientDrawable().apply {
             setColor(tokens.selectedRow)
-            cornerRadius = UiStyleProvider.dp(ctx, 8).toFloat()
+            cornerRadius = UiStyleProvider.dp(ctx, if (google) 500 else 8).toFloat()
         } else null
         if (selected) {
             year.textSize = 22f
             year.typeface = UiStyleProvider.titleTypeface(tokens)
-            year.setTextColor(tokens.text)
+            year.setTextColor(if (google) tokens.selectedRowText else tokens.text)
+            countView.setTextColor(if (google) (tokens.selectedRowText and 0x00FFFFFF) or 0xBF000000.toInt() else tokens.dim)
         } else {
             year.textSize = 17f
             year.typeface = UiStyleProvider.bodyTypeface(tokens)
-            year.setTextColor(tokens.text2)
+            year.setTextColor(if (google) tokens.dim else tokens.text2)
+            countView.setTextColor(tokens.dim)
         }
         row.onFocusGained = { onFocused(y) }
         // the single-column grid does not let the focus out sideways: hand it to the months
@@ -328,7 +333,9 @@ private class MonthCellPresenter(
 
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
         val ctx = parent.context
-        val card = FocusCardView(ctx, tokens, focusScale = 1.07f, radiusDp = 9f)
+        val google = tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.GOOGLE_TV
+        // mockup corners: Apple 18px, Google TV 16px; focus scale 1.07 / 1.08
+        val card = FocusCardView(ctx, tokens, focusScale = tokens.focusScale.takeIf { google } ?: 1.07f, radiusDp = if (google) 8f else 9f)
         val image = ImageView(ctx)
         image.scaleType = ImageView.ScaleType.CENTER_CROP
         card.addView(image, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -409,7 +416,7 @@ private class MonthCellPresenter(
             card.layoutParams = ViewGroup.MarginLayoutParams(UiStyleProvider.dp(ctx, 120), UiStyleProvider.dp(ctx, 80))
         }
         name.text = monthName(cell.month)
-        val radius = UiStyleProvider.dp(ctx, 9).toFloat()
+        val radius = UiStyleProvider.dp(ctx, if (tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.GOOGLE_TV) 8 else 9).toFloat()
         if (cell.count > 0) {
             count.text = UiFormat.count(cell.count)
             count.visibility = View.VISIBLE
@@ -445,7 +452,7 @@ private class MonthCellPresenter(
             card.background = GradientDrawable().apply {
                 setColor(0x00000000)
                 cornerRadius = radius
-                setStroke(UiStyleProvider.dp(ctx, 1f), 0x33FFFFFF, UiStyleProvider.dp(ctx, 4f).toFloat(), UiStyleProvider.dp(ctx, 4f).toFloat())
+                setStroke(UiStyleProvider.dp(ctx, 1f), 0x1AFFFFFF, UiStyleProvider.dp(ctx, 4f).toFloat(), UiStyleProvider.dp(ctx, 4f).toFloat())
             }
             scrim.visibility = View.GONE
             image.setImageDrawable(null)

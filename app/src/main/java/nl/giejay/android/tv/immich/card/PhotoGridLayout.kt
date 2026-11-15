@@ -21,6 +21,7 @@ import kotlin.math.roundToInt
 class PhotoGridLayout(
     private val gridView: VerticalGridView,
     private val tokens: UiTokens,
+    private val sidePaddingDp: Int,
     private val onChanged: (columns: Int, tileSizePx: Int) -> Unit
 ) {
     private var lastWidth = -1
@@ -39,7 +40,7 @@ class PhotoGridLayout(
 
     fun attach() {
         val context = gridView.context
-        val padH = UiStyleProvider.dp(context, tokens.contentPaddingHDp)
+        val padH = UiStyleProvider.dp(context, sidePaddingDp)
         val gap = UiStyleProvider.dp(context, tokens.gridGapDp)
         // top padding = room for the focused tile's scale (taken from the header gap, see
         // VerticalCardGridFragment). Not clipped to padding (the focus ring needs the side room);
@@ -80,7 +81,7 @@ class PhotoGridLayout(
         if (width <= 0 || width == lastWidth) return
         lastWidth = width
         val context = gridView.context
-        val padH = UiStyleProvider.dp(context, tokens.contentPaddingHDp)
+        val padH = UiStyleProvider.dp(context, sidePaddingDp)
         val gap = UiStyleProvider.dp(context, tokens.gridGapDp)
         val wantedCell = UiStyleProvider.dp(context, tokens.gridCellDp)
         val hidden = if (menuShown) UiStyleProvider.dp(context, tokens.sidebarWidthDp) else 0

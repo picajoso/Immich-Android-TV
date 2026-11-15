@@ -335,7 +335,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         super.onGridViewCreated(gridView)
         if (!usePhotoTiles) return
         val tokens = UiStyleProvider.current()
-        photoGridLayout = PhotoGridLayout(gridView, tokens) { columns, tileSize ->
+        photoGridLayout = PhotoGridLayout(gridView, tokens, if (hostedInBrowse) tokens.contentPaddingHDp else 32) { columns, tileSize ->
             currentColumns = columns
             photoTilePresenter?.let {
                 it.tileSizePx = tileSize
@@ -386,13 +386,15 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         // standalone (month view, mockup apple-07): 48px top, 64px title, 30px below
         val top = if (standalone) 24 else if (compact) tokens.contentPaddingTopCompactDp else tokens.contentPaddingTopDp
         val gap = if (compact) tokens.headerGapCompactDp else tokens.headerGapDp
+        val sidePad = if (standalone) 32 else tokens.contentPaddingHDp
         header.setPadding(
-            UiStyleProvider.dp(context, tokens.contentPaddingHDp),
+            UiStyleProvider.dp(context, sidePad),
             UiStyleProvider.dp(context, top),
-            UiStyleProvider.dp(context, tokens.contentPaddingHDp) + hidden,
+            UiStyleProvider.dp(context, sidePad) + hidden,
             (UiStyleProvider.dp(context, gap) - PhotoGridLayout.focusRoomPx(context, tokens)).coerceAtLeast(0)
         )
-        title.textSize = if (compact) tokens.titleCompactSizeSp else tokens.titleSizeSp
+        // month view (apple-07 / googletv-07): 64px title in both styles
+        title.textSize = if (standalone) 32f else if (compact) tokens.titleCompactSizeSp else tokens.titleSizeSp
         lineHeightOne(title)
     }
 
