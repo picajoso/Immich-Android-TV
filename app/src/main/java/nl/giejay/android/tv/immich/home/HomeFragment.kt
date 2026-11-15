@@ -59,7 +59,7 @@ class HomeFragment : BrowseSupportFragment() {
 
     /** The drawer container; only touched in the Google TV style. */
     private fun drawerDock(): View? =
-        if (isApple) null else view?.findViewById(androidx.leanback.R.id.browse_headers_dock)
+        null
     private val settingsSpacer = SpacerRow()
     private var spacerListenerAdded = false
     val immichRowPresenter = ImmichRowPresenter()
@@ -285,7 +285,7 @@ class HomeFragment : BrowseSupportFragment() {
             setColor(if (tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.APPLE) tokens.selectedRow else (tokens.dim and 0x00FFFFFF) or (0x99 shl 24))
         }
         // Google TV: the drawer overlays the content, which is dimmed behind it
-        if (!isApple) {
+        if (false) {
             // not scale_frame: Leanback replaces its children whenever the page changes
             (root.findViewById<View>(androidx.leanback.R.id.browse_container_dock) as? ViewGroup)?.let { frame2 ->
                 val dim = View(context)

@@ -359,8 +359,8 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
      * The side menu only exists while this grid is a page of the home browse (Photos, Random...).
      * Grids opened on their own (the month view) are full screen.
      */
-    /** Apple's menu pushes the content aside, Google TV's drawer overlays it (see MainActivity). */
-    private val menuPushesContent: Boolean get() = UiStyleProvider.current().style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.APPLE
+    /** The menu pushes the content aside in both styles. */
+    private val menuPushesContent: Boolean get() = true
     private val hostedInBrowse: Boolean get() = parentFragment is androidx.leanback.app.BrowseSupportFragment
     private var menuShown: Boolean = true
 
