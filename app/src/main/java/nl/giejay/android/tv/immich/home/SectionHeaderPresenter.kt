@@ -20,19 +20,31 @@ class SectionHeaderPresenter : Presenter() {
         )
         label.isFocusable = false
         label.typeface = UiStyleProvider.titleTypeface(tokens)
-        label.textSize = tokens.bodySizeSp
+        // mockup: 24px / weight 600, padding 0 20px 12px (28px top for the 2nd group)
+        label.textSize = 12f
         label.setTextColor(tokens.dim)
-        label.setPadding(
-            UiStyleProvider.dp(context, 10),
-            UiStyleProvider.dp(context, 12),
-            UiStyleProvider.dp(context, 10),
-            UiStyleProvider.dp(context, 4)
-        )
+        label.minimumWidth = UiStyleProvider.dp(context, tokens.sidebarWidthDp - 2 * SIDEBAR_PAD_H_DP)
         return ViewHolder(label)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
-        (viewHolder.view as TextView).text = (item as? Row)?.headerItem?.name
+        val label = viewHolder.view as TextView
+        val context = label.context
+        val row = item as? Row
+        label.text = row?.headerItem?.name
+        // the first group label sits at the top, the next ones are separated from the rows above
+        val first = (row?.headerItem?.id ?: -1L) == -1L
+        label.setPadding(
+            UiStyleProvider.dp(context, 10),
+            UiStyleProvider.dp(context, if (first) 0 else 14),
+            UiStyleProvider.dp(context, 10),
+            UiStyleProvider.dp(context, 6)
+        )
+    }
+
+    companion object {
+        /** horizontal padding of the sidebar list (mockup: 28px) */
+        const val SIDEBAR_PAD_H_DP = 14
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {

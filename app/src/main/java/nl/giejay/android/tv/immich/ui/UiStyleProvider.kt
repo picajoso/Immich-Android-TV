@@ -32,6 +32,8 @@ data class UiTokens(
     val focusRing: Int,
     val pillBg: Int,
     val tileRadiusDp: Float,
+    /** corner radius of the focused (scaled) tile; Apple tiles are square until focused */
+    val focusedTileRadiusDp: Float,
     val gridGapDp: Float,
     val focusScale: Float,
     /** wanted edge of a grid cell; the real column count is derived from the available width */
@@ -39,7 +41,14 @@ data class UiTokens(
     val sidebarWidthDp: Int,
     val contentPaddingHDp: Int,
     val contentPaddingTopDp: Int,
+    /** top padding of a grid header while the menu is hidden */
+    val contentPaddingTopCompactDp: Int,
+    /** space between the header row and the grid (menu shown / hidden) */
+    val headerGapDp: Int,
+    val headerGapCompactDp: Int,
     val titleSizeSp: Float,
+    /** title size while the menu is hidden */
+    val titleCompactSizeSp: Float,
     val bodySizeSp: Float,
     val rowCornerDp: Float
 )
@@ -65,13 +74,18 @@ object UiStyleProvider {
         focusRing = 0xFFFFFFFF.toInt(),
         pillBg = 0xFF1C1C1E.toInt(),
         tileRadiusDp = 0f,
+        focusedTileRadiusDp = 3f,
         gridGapDp = 2f,
         focusScale = 1.14f,
         gridCellDp = 98f,
         sidebarWidthDp = 200,
         contentPaddingHDp = 32,
         contentPaddingTopDp = 30,
+        contentPaddingTopCompactDp = 22,
+        headerGapDp = 15,
+        headerGapCompactDp = 13,
         titleSizeSp = 32f,
+        titleCompactSizeSp = 22f,
         bodySizeSp = 13f,
         rowCornerDp = 7f
     )
@@ -91,13 +105,18 @@ object UiStyleProvider {
         focusRing = 0xFFFFFFFF.toInt(),
         pillBg = 0xFF2B2C31.toInt(),
         tileRadiusDp = 6f,
+        focusedTileRadiusDp = 6f,
         gridGapDp = 8f,
         focusScale = 1.09f,
         gridCellDp = 103f,
         sidebarWidthDp = 200,
         contentPaddingHDp = 40,
         contentPaddingTopDp = 26,
+        contentPaddingTopCompactDp = 26,
+        headerGapDp = 15,
+        headerGapCompactDp = 15,
         titleSizeSp = 26f,
+        titleCompactSizeSp = 26f,
         bodySizeSp = 13f,
         rowCornerDp = 31f
     )
@@ -157,7 +176,7 @@ object UiStyleProvider {
     fun tileFocusRing(context: Context, t: UiTokens): StateListDrawable {
         val ring = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = dp(context, t.tileRadiusDp).toFloat()
+            cornerRadius = dp(context, t.focusedTileRadiusDp).toFloat()
             setColor(Color.TRANSPARENT)
             setStroke(dp(context, 2f), t.focusRing)
         }

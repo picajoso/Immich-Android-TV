@@ -55,6 +55,8 @@ class PhotoTilePresenter(private val context: Context, private val tokens: UiTok
             true
         }
 
+        tile.syncFocusState()
+
         val realCard = card as? Card
         tile.setBadges(isVideo = realCard?.isVideo == true, isFavorite = realCard?.isFavorite == true)
 
@@ -84,6 +86,9 @@ class PhotoTilePresenter(private val context: Context, private val tokens: UiTok
  * onFocusChanged because Leanback replaces any OnFocusChangeListener set on grid items.
  */
 class PhotoTileView(context: Context, private val tokens: UiTokens) : FrameLayout(context) {
+    private val radius = UiStyleProvider.dp(context, tokens.tileRadiusDp).toFloat()
+    private val focusedRadius = UiStyleProvider.dp(context, tokens.focusedTileRadiusDp).toFloat()
+    private var cornerRadius = radius
     val image: ImageView = ImageView(context)
     private val heart = ImageView(context)
     private val play = ImageView(context)
@@ -115,10 +120,9 @@ class PhotoTileView(context: Context, private val tokens: UiTokens) : FrameLayou
         background = ColorDrawable(tokens.pillBg)
         foreground = UiStyleProvider.tileFocusRing(context, tokens)
 
-        val radius = UiStyleProvider.dp(context, tokens.tileRadiusDp).toFloat()
         outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
-                outline.setRoundRect(0, 0, view.width, view.height, radius)
+                outline.setRoundRect(0, 0, view.width, view.height, cornerRadius)
             }
         }
         clipToOutline = true
@@ -132,8 +136,21 @@ class PhotoTileView(context: Context, private val tokens: UiTokens) : FrameLayou
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: android.graphics.Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         val scale = if (gainFocus) tokens.focusScale else 1f
+        cornerRadius = if (gainFocus) focusedRadius else radius
+        invalidateOutline()
         val z = if (gainFocus) UiStyleProvider.dp(context, 12).toFloat() else 0f
         animate().scaleX(scale).scaleY(scale).translationZ(z).setDuration(120).start()
+    }
+
+    /** Applies the focus look immediately (no animation), e.g. after a rebind. */
+    fun syncFocusState() {
+        animate().cancel()
+        val focused = isFocused
+        scaleX = if (focused) tokens.focusScale else 1f
+        scaleY = scaleX
+        translationZ = if (focused) UiStyleProvider.dp(context, 12).toFloat() else 0f
+        cornerRadius = if (focused) focusedRadius else radius
+        invalidateOutline()
     }
 
     fun resetFocusState() {
@@ -141,5 +158,7 @@ class PhotoTileView(context: Context, private val tokens: UiTokens) : FrameLayou
         scaleX = 1f
         scaleY = 1f
         translationZ = 0f
+        cornerRadius = radius
+        invalidateOutline()
     }
 }

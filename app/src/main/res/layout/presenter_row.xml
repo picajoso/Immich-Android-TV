@@ -30,5 +30,14 @@
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:includeFontPadding="false"
         />
+    <!-- optional counter on the right (Photos: number of items in the library) -->
+    <TextView android:id="@+id/row_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:singleLine="true"
+        android:textSize="10.5sp"
+        android:visibility="gone" />
 </LinearLayout>

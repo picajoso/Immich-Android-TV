@@ -11,7 +11,9 @@
     <dimen name="card_height_5_cols">79dp</dimen>
 
     <dimen name="lb_browse_headers_width">200dp</dimen>
-    <dimen name="lb_browse_header_padding_end">12dp</dimen>
+    <dimen name="lb_browse_header_padding_end">0dp</dimen>
+    <!-- redesign: the side menu highlights the focused row, it does not zoom it -->
+    <item name="lb_browse_header_select_scale" format="float" type="dimen">1.0</item>
     
     <dimen name="lb_browse_rows_margin_start">200dp</dimen>
 

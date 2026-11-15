@@ -53,6 +53,9 @@ interface ApiService {
     @GET("assets/{id}")
     suspend fun getAsset(@Path("id") id: String): Response<Asset>
 
+    @GET("assets/statistics")
+    suspend fun assetStatistics(): Response<nl.giejay.android.tv.immich.api.model.AssetStatistics>
+
     @GET("view/folder/unique-paths")
     suspend fun getUniquePaths(): Response<List<String>>
 

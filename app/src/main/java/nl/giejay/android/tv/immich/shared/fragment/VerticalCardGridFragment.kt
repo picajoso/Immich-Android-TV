@@ -10,6 +10,7 @@ import android.graphics.Typeface
 import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.leanback.app.BackgroundManager
@@ -325,7 +326,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         super.onGridViewCreated(gridView)
         if (!usePhotoTiles) return
         val tokens = UiStyleProvider.current()
-        PhotoGridLayout(gridView, tokens) { columns, tileSize ->
+        photoGridLayout = PhotoGridLayout(gridView, tokens) { columns, tileSize ->
             currentColumns = columns
             photoTilePresenter?.let {
                 it.tileSizePx = tileSize
@@ -334,7 +335,53 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
                     adapter.notifyArrayItemRangeChanged(0, adapter.size())
                 }
             }
-        }.attach()
+        }.also {
+            it.menuShown = menuShown
+            it.attach()
+        }
+    }
+
+    private var photoGridLayout: PhotoGridLayout? = null
+    private var menuShown: Boolean = true
+
+    override fun onMenuVisibilityChanged(menuShown: Boolean) {
+        this.menuShown = menuShown
+        if (!usePhotoTiles) return
+        photoGridLayout?.menuShown = menuShown
+        view?.let { layoutPhotoHeader(it) }
+    }
+
+    /**
+     * Header of the photo grid. Menu shown (mockup ①): 60px top, 64px title, 30px below.
+     * Menu hidden (mockup ②): 44px top, 44px title, 26px below. The content is as wide as the
+     * screen and slides right under the menu, so the right padding adds the menu width.
+     */
+    private fun layoutPhotoHeader(root: View) {
+        val tokens = UiStyleProvider.current()
+        val context = root.context
+        val header = root.findViewById<View>(R.id.grid_header) ?: return
+        val title = root.findViewById<TextView>(R.id.grid_title) ?: return
+        val compact = !menuShown
+        val hidden = if (menuShown) UiStyleProvider.dp(context, tokens.sidebarWidthDp) else 0
+        header.setPadding(
+            UiStyleProvider.dp(context, tokens.contentPaddingHDp),
+            UiStyleProvider.dp(context, if (compact) tokens.contentPaddingTopCompactDp else tokens.contentPaddingTopDp),
+            UiStyleProvider.dp(context, tokens.contentPaddingHDp) + hidden,
+            (UiStyleProvider.dp(context, if (compact) tokens.headerGapCompactDp else tokens.headerGapDp) -
+                PhotoGridLayout.focusRoomPx(context, tokens)).coerceAtLeast(0)
+        )
+        title.textSize = if (compact) tokens.titleCompactSizeSp else tokens.titleSizeSp
+        lineHeightOne(title)
+    }
+
+    /** CSS line-height:1 — the text box is as tall as the font size (negative half-leading). */
+    private fun lineHeightOne(view: TextView) {
+        val fm = view.paint.fontMetricsInt
+        val extra = (fm.descent - fm.ascent) - view.textSize.toInt()
+        val lp = view.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        lp.topMargin = -extra / 2
+        lp.bottomMargin = -(extra - extra / 2)
+        view.layoutParams = lp
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -352,14 +399,12 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         val pill = root.findViewById<TextView>(R.id.grid_date_pill)
 
         header.visibility = View.VISIBLE
-        header.setPadding(
-            UiStyleProvider.dp(context, tokens.contentPaddingHDp),
-            UiStyleProvider.dp(context, tokens.contentPaddingTopDp),
-            UiStyleProvider.dp(context, tokens.contentPaddingHDp),
-            UiStyleProvider.dp(context, 15)
-        )
         title.text = photoGridTitle
         UiStyleProvider.applyTitle(title, tokens)
+        // line-height 1 like the mockup's h2
+        title.includeFontPadding = false
+        pill.includeFontPadding = false
+        layoutPhotoHeader(root)
 
         UiStyleProvider.applyBody(pill, tokens, tokens.bodySizeSp, tokens.dim)
         pill.background = UiStyleProvider.pillBackground(context, tokens)

@@ -53,6 +53,16 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    /**
+     * The interface is laid out 1:1 against 1080p designs: text ignores the system font scale so
+     * sizes and line breaks match the references (decision of the app owner).
+     */
+    override fun attachBaseContext(newBase: android.content.Context) {
+        val config = android.content.res.Configuration(newBase.resources.configuration)
+        config.fontScale = 1f
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
+
     // KEYCODE_PROG_RED (keycode 183) for delete photo
     private val DELETE_BUTTON_KEYCODE = 183
 

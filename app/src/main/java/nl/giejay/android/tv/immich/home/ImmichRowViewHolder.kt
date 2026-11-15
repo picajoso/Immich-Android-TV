@@ -11,9 +11,11 @@ class ImmichRowViewHolder(view: View) : RowHeaderPresenter.ViewHolder(view) {
     val tvTitle: TextView
     val icon: ImageView
     val navIcon: ImageView
+    val count: TextView
     init {
         tvTitle = view.findViewById(R.id.tvTitle)
         icon = view.findViewById(R.id.row_visible)
         navIcon = view.findViewById(R.id.row_nav_icon)
+        count = view.findViewById(R.id.row_count)
     }
 }

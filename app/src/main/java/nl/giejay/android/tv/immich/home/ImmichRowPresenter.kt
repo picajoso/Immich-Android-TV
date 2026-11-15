@@ -29,11 +29,15 @@ class ImmichRowPresenter : Presenter() {
         val padH = UiStyleProvider.dp(context, 10)
         val padV = UiStyleProvider.dp(context, 7)
         root.setPadding(padH, padV, padH, padV)
+        // full width highlight: Leanback wraps header views in a wrap_content frame
+        root.minimumWidth = UiStyleProvider.dp(context, tokens.sidebarWidthDp - 2 * SectionHeaderPresenter.SIDEBAR_PAD_H_DP)
 
         viewHolder.tvTitle.setTextColor(UiStyleProvider.sidebarRowTextColors(tokens))
         viewHolder.tvTitle.typeface = UiStyleProvider.bodyTypeface(tokens)
         viewHolder.tvTitle.textSize = tokens.bodySizeSp
         updateIconTint(viewHolder, tokens.style, false)
+        viewHolder.count.typeface = UiStyleProvider.bodyTypeface(tokens)
+        viewHolder.count.setTextColor(tokens.dim)
 
         // the title is the focusable view, the whole row (root) shows the highlight
         viewHolder.tvTitle.setOnFocusChangeListener { _, hasFocus ->
@@ -60,6 +64,10 @@ class ImmichRowPresenter : Presenter() {
         val headerItem = if (item == null) null else (item as Row).headerItem
         val vh = viewHolder as ImmichRowViewHolder
         vh.tvTitle.text = headerItem?.name
+
+        val count = headerItem?.name?.let { counts[it] }
+        vh.count.text = count
+        vh.count.visibility = if (count != null && !editMode) View.VISIBLE else View.GONE
 
         val iconRes = headerItem?.name?.let { ICONS[it] }
         if (iconRes != null) {
@@ -91,6 +99,9 @@ class ImmichRowPresenter : Presenter() {
     }
 
     companion object {
+        /** Counter shown at the right of a menu entry, by entry name (e.g. "Photos" -> "4.812"). */
+        val counts: MutableMap<String, String> = mutableMapOf()
+
         val ICONS: Map<String, Int> = mapOf(
             "Photos" to R.drawable.ic_nav_photos,
             "Albums" to R.drawable.ic_nav_albums,

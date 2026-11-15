@@ -52,7 +52,18 @@ open class GridFragment(val hideProgressBar: Boolean = false) : BrandedSupportFr
             override fun setEntranceTransitionState(state: Boolean) {
                 this@GridFragment.setEntranceTransitionState(state)
             }
+
+            override fun setExpand(expand: Boolean) {
+                super.setExpand(expand)
+                this@GridFragment.onMenuVisibilityChanged(!expand)
+            }
+        }.apply {
+            // keep the content at 1:1 next to the menu (no Leanback rows scale-down)
+            setScalingEnabled(false)
         }
+
+    /** Called when the side menu is shown (true) or hidden (false). */
+    protected open fun onMenuVisibilityChanged(menuShown: Boolean) {}
     var gridPresenter: VerticalGridPresenter?
         /**
          * Returns the grid presenter.

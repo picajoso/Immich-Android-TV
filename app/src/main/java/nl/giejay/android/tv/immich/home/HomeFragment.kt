@@ -34,6 +34,10 @@ import nl.giejay.android.tv.immich.shared.prefs.HIDDEN_HOME_ITEMS
 import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.assets.IntegratedTimelineFragment
 import nl.giejay.android.tv.immich.ui.UiStyleProvider
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class HomeFragment : BrowseSupportFragment() {
@@ -43,6 +47,8 @@ class HomeFragment : BrowseSupportFragment() {
         GROUPS.mapIndexed { index, group -> SectionRow(HeaderItem(-(index + 1).toLong(), group.first)) }
     }
     private var edgeHint: View? = null
+    private val settingsSpacer = SpacerRow()
+    private var spacerListenerAdded = false
     val immichRowPresenter = ImmichRowPresenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,12 +64,15 @@ class HomeFragment : BrowseSupportFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        spacerListenerAdded = false
         headersSupportFragment.setOnHeaderViewSelectedListener { _, row ->
             title = row?.headerItem?.name ?: "-"
             selectedPosition = row?.let { mRowsAdapter.indexOf(it) } ?: 0
         }
 
         setupEdgeHint(view)
+        styleHeaders()
+        loadMenuCounters()
 
         if (savedInstanceState == null) {
             // position 0 is a (non selectable) group label, start on the first page
@@ -74,6 +83,86 @@ class HomeFragment : BrowseSupportFragment() {
         headersSupportFragment.setOnHeaderClickedListener { _, _ ->
             if (!this.isInHeadersTransition) {
                 this.startHeadersTransition(false)
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // BrowseSupportFragment.onStart re-applies its own header alignment, override it again
+        styleHeaders()
+        if (!spacerListenerAdded) {
+            headersSupportFragment?.verticalGridView?.let { grid ->
+                spacerListenerAdded = true
+                grid.viewTreeObserver.addOnGlobalLayoutListener { adjustSettingsSpacer(grid) }
+            }
+        }
+    }
+
+    /**
+     * Lays the side menu out like the mockup (nav: padding 64px 28px, rows 4px apart) instead of the
+     * stock Leanback headers (56dp start padding, 21dp spacing, selected row pinned at 167dp).
+     */
+    private fun styleHeaders() {
+        val grid = headersSupportFragment?.verticalGridView ?: return
+        val context = grid.context
+        val tokens = UiStyleProvider.current()
+        val padH = UiStyleProvider.dp(context, SectionHeaderPresenter.SIDEBAR_PAD_H_DP)
+        val padV = UiStyleProvider.dp(context, 32)
+        grid.setPadding(padH, padV, padH, padV)
+        grid.clipToPadding = false
+        grid.setVerticalSpacing(UiStyleProvider.dp(context, 2))
+        grid.layoutParams = grid.layoutParams.apply { width = UiStyleProvider.dp(context, tokens.sidebarWidthDp) }
+        // the whole menu fits on screen: keep it still instead of scrolling the focused row to a keyline
+        grid.windowAlignment = androidx.leanback.widget.BaseGridView.WINDOW_ALIGN_BOTH_EDGE
+        grid.windowAlignmentOffset = 0
+        grid.windowAlignmentOffsetPercent = 50f
+        grid.itemAlignmentOffset = 0
+        grid.itemAlignmentOffsetPercent = 50f
+        (grid.parent as? View)?.let { root ->
+            root.setPadding(0, 0, 0, 0)
+            root.findViewById<View>(androidx.leanback.R.id.fade_out_edge)?.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Apple style pins Settings to the bottom of the menu (mockup: margin-top:auto). The menu is a
+     * Leanback list, so an empty [SpacerRow] before Settings takes up the remaining height.
+     */
+    private fun adjustSettingsSpacer(grid: androidx.leanback.widget.VerticalGridView) {
+        if (!::mRowsAdapter.isInitialized) return
+        val spacerIndex = (0 until mRowsAdapter.size()).firstOrNull { mRowsAdapter.get(it) is SpacerRow } ?: return
+        if (grid.childCount != mRowsAdapter.size()) return // not everything laid out yet
+        var used = 0
+        var spacerView: View? = null
+        for (i in 0 until grid.childCount) {
+            val child = grid.getChildAt(i)
+            if (grid.getChildAdapterPosition(child) == spacerIndex) {
+                spacerView = child
+            } else {
+                used += child.height
+            }
+        }
+        val spacer = spacerView ?: return
+        val spacing = UiStyleProvider.dp(grid.context, 2) * (grid.childCount - 1)
+        val wanted = (grid.height - grid.paddingTop - grid.paddingBottom - used - spacing).coerceAtLeast(0)
+        if (spacer.layoutParams.height != wanted) {
+            spacer.layoutParams = spacer.layoutParams.apply { height = wanted }
+        }
+    }
+
+    /** Fills the counters of the menu (Photos: number of items in the library). */
+    private fun loadMenuCounters() {
+        val client = nl.giejay.android.tv.immich.shared.util.currentApiClient() ?: return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val stats = withContext(Dispatchers.IO) { client.assetStatistics() }
+            stats.getOrNull()?.let {
+                val text = java.text.NumberFormat.getIntegerInstance().format(it.total)
+                ImmichRowPresenter.counts["Photos"] = text
+                pageRows["Photos"]?.let { row ->
+                    val index = mRowsAdapter.indexOf(row)
+                    if (index >= 0) mRowsAdapter.notifyArrayItemRangeChanged(index, 1)
+                }
             }
         }
     }
@@ -101,6 +190,7 @@ class HomeFragment : BrowseSupportFragment() {
 
         val sHeaderPresenter: PresenterSelector = ClassPresenterSelector()
             .addClassPresenter(DividerRow::class.java, DividerPresenter())
+            .addClassPresenter(SpacerRow::class.java, SpacerPresenter())
             .addClassPresenter(
                 SectionRow::class.java,
                 SectionHeaderPresenter()
@@ -138,6 +228,9 @@ class HomeFragment : BrowseSupportFragment() {
             }
         }
         if (!immichRowPresenter.editMode) {
+            if (UiStyleProvider.current().style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.APPLE) {
+                items.add(settingsSpacer)
+            }
             pageRows["Settings"]?.let { items.add(it) }
         }
         mRowsAdapter.clear()
@@ -150,14 +243,15 @@ class HomeFragment : BrowseSupportFragment() {
         val tokens = UiStyleProvider.current()
         val context = root.context
         val hint = View(context)
+        // mockup: 10px x 120px tab, 8px radius on the right, --sel color
         hint.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            val r = UiStyleProvider.dp(context, 3).toFloat()
+            val r = UiStyleProvider.dp(context, 4).toFloat()
             // rounded on the right side only
             cornerRadii = floatArrayOf(0f, 0f, r, r, r, r, 0f, 0f)
-            setColor((tokens.dim and 0x00FFFFFF) or (0x99 shl 24))
+            setColor(if (tokens.style == nl.giejay.android.tv.immich.shared.prefs.UiStyle.APPLE) tokens.selectedRow else (tokens.dim and 0x00FFFFFF) or (0x99 shl 24))
         }
-        val lp = FrameLayout.LayoutParams(UiStyleProvider.dp(context, 3), UiStyleProvider.dp(context, 60))
+        val lp = FrameLayout.LayoutParams(UiStyleProvider.dp(context, 5), UiStyleProvider.dp(context, 60))
         lp.gravity = Gravity.START or Gravity.CENTER_VERTICAL
         hint.visibility = View.GONE
         frame.addView(hint, lp)
@@ -215,3 +309,21 @@ class HomeFragment : BrowseSupportFragment() {
 }
 
 class Header(val name: String, var show: Boolean = false, val fragment: () -> Fragment)
+
+/** Empty, non focusable entry of the side menu used to push Settings to the bottom. */
+class SpacerRow : Row(HeaderItem(-100L, "")) {
+    // like SectionRow / PageRow: only lives in the menu, never rendered as a content row
+    override fun isRenderedAsRowView(): Boolean = false
+}
+
+class SpacerPresenter : androidx.leanback.widget.Presenter() {
+    override fun onCreateViewHolder(parent: android.view.ViewGroup): ViewHolder {
+        val view = View(parent.context)
+        view.isFocusable = false
+        view.layoutParams = android.view.ViewGroup.LayoutParams(1, 0)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {}
+    override fun onUnbindViewHolder(viewHolder: ViewHolder) {}
+}
