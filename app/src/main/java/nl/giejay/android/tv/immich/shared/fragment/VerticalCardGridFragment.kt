@@ -335,6 +335,7 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         super.onGridViewCreated(gridView)
         if (!usePhotoTiles) return
         val tokens = UiStyleProvider.current()
+        photoGridView = gridView
         photoGridLayout = PhotoGridLayout(gridView, tokens, if (hostedInBrowse) tokens.contentPaddingHDp else 32) { columns, tileSize ->
             currentColumns = columns
             photoTilePresenter?.let {
@@ -464,17 +465,73 @@ abstract class VerticalCardGridFragment<ITEM> : GridFragment() {
         datePill = pill
     }
 
-    /** Shows a small pill-shaped action button in the header of a photo grid (e.g. "Shuffle"). */
-    protected fun setHeaderAction(text: String, onClick: () -> Unit) {
+    /**
+     * Shows a pill-shaped action button (icon + text) before the date pill of a photo grid, e.g.
+     * "Shuffle". [info] is an optional dim text before it ("231 photos").
+     */
+    protected fun setHeaderAction(text: String, iconRes: Int? = null, info: String? = null, onClick: () -> Unit) {
         val root = view ?: return
-        val actions = root.findViewById<View>(R.id.grid_header_actions) ?: return
-        val button = root.findViewById<TextView>(R.id.grid_action_next) ?: return
-        nl.giejay.android.tv.immich.ui.PageKit.stylePill(button, UiStyleProvider.current(), selected = false)
+        val extra = root.findViewById<View>(R.id.grid_header_extra) ?: return
+        val button = root.findViewById<TextView>(R.id.grid_action_main) ?: return
+        val tokens = UiStyleProvider.current()
+        val ctx = root.context
+        // mockup: 64px tall, 28px side padding, 14px between icon and text
+        UiStyleProvider.applyBody(button, tokens, 13f, tokens.text)
+        button.includeFontPadding = false
         button.text = text
-        button.visibility = View.VISIBLE
-        actions.visibility = View.VISIBLE
+        button.minHeight = UiStyleProvider.dp(ctx, 32)
+        button.gravity = android.view.Gravity.CENTER_VERTICAL
+        button.setPadding(UiStyleProvider.dp(ctx, 14), 0, UiStyleProvider.dp(ctx, 14), 0)
+        fun pill(stroke: Boolean) = android.graphics.drawable.GradientDrawable().apply {
+            shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+            cornerRadius = UiStyleProvider.dp(ctx, 500).toFloat()
+            setColor(tokens.pillBg)
+            if (stroke) setStroke(UiStyleProvider.dp(ctx, 2f), tokens.focusRing)
+        }
+        button.background = android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_focused), pill(true))
+            addState(intArrayOf(), pill(false))
+        }
+        if (iconRes != null) {
+            val icon = androidx.core.content.ContextCompat.getDrawable(ctx, iconRes)?.mutate()
+            icon?.setTint(tokens.text)
+            val size = UiStyleProvider.dp(ctx, 14)
+            icon?.setBounds(0, 0, size, size)
+            button.setCompoundDrawablesRelative(icon, null, null, null)
+            button.compoundDrawablePadding = UiStyleProvider.dp(ctx, 7)
+        }
+        root.findViewById<TextView>(R.id.grid_info)?.let { infoView ->
+            infoView.visibility = if (info.isNullOrEmpty()) View.GONE else View.VISIBLE
+            infoView.text = info
+            UiStyleProvider.applyBody(infoView, tokens, 13f, tokens.dim)
+        }
+        extra.visibility = View.VISIBLE
         button.setOnClickListener { onClick() }
+        // The first focusable view of the page gets the focus when the page is entered, which would
+        // be this button. Make it reachable (UP from the first row) only once the grid had the focus.
+        button.isFocusable = false
+        val listener = object : android.view.ViewTreeObserver.OnGlobalFocusChangeListener {
+            override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
+                val grid = photoGridView ?: return
+                if (newFocus != null && newFocus !== button && grid.hasFocus()) {
+                    button.isFocusable = true
+                    // UP from the first row reaches the header action
+                    grid.setOnKeyInterceptListener { event ->
+                        if (event.keyCode == android.view.KeyEvent.KEYCODE_DPAD_UP && event.action == android.view.KeyEvent.ACTION_DOWN &&
+                            grid.selectedPosition in 0 until currentColumns && button.visibility == View.VISIBLE
+                        ) {
+                            button.requestFocus()
+                            true
+                        } else false
+                    }
+                    root.viewTreeObserver.removeOnGlobalFocusChangeListener(this)
+                }
+            }
+        }
+        root.viewTreeObserver.addOnGlobalFocusChangeListener(listener)
     }
+
+    private var photoGridView: VerticalGridView? = null
 
     /** True while the date pill has no text yet. */
     protected fun isDatePillEmpty(): Boolean = datePill?.text.isNullOrEmpty()

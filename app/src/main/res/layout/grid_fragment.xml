@@ -50,6 +50,34 @@
                             android:focusable="false" />
                 </LinearLayout>
 
+                <!-- optional page action before the date pill (Random: Shuffle, Favorites: count + Slideshow) -->
+                <LinearLayout
+                        android:id="@+id/grid_header_extra"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone">
+
+                    <TextView
+                            android:id="@+id/grid_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:singleLine="true"
+                            android:focusable="false"
+                            android:visibility="gone" />
+
+                    <TextView
+                            android:id="@+id/grid_action_main"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="7dp"
+                            android:singleLine="true"
+                            android:focusable="true"
+                            android:clickable="true" />
+                </LinearLayout>
+
                 <TextView
                         android:id="@+id/grid_date_pill"
                         android:layout_width="wrap_content"
