@@ -229,7 +229,8 @@ object UiStyleProvider {
             primaryText = t.bg,
             secondaryBg = t.pillBg,
             secondaryText = t.text,
-            focusRing = t.focusRing,
+            focusRing = 0,
+            photoInsetDp = 0,
             buttonCornerDp = 36f,
             titleTypeface = titleTypeface(t),
             bodyTypeface = bodyTypeface(t)
