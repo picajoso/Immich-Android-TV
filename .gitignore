@@ -19,3 +19,6 @@ mediasliderold
 mediaslider2
 commits.txt
 service-account-key.json
+
+# compiled apps are published as GitHub Releases, not committed
+*.apk

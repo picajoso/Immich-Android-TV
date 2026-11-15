@@ -18,8 +18,10 @@ The app is free software licensed under the **GNU General Public License v3.0** 
 you may use, study, modify and redistribute it under the same terms, which include keeping this
 notice and making the corresponding source code available to the people you give the app to.
 
-The `mediaslider` module (the photo viewer, fork of giejay/MediaSliderView) is licensed under the
-**Apache License 2.0** (see `mediaslider/LICENSE.md`).
+The `mediaslider` module (the photo viewer) is licensed under the **Apache License 2.0** (see
+`mediaslider/LICENSE.md`). It descends from [Zeuskartik/MediaSliderView](https://github.com/Zeuskartik/MediaSliderView)
+through giejay's fork, and has been extended here (information pill and panel, per-style looks,
+slideshow hook, translations).
 
 Parts of the code come from Google's Android TV samples (Apache License 2.0, see the headers of the
 files concerned).
