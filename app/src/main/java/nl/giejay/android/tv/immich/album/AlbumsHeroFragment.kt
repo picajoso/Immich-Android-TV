@@ -1,11 +1,16 @@
 package nl.giejay.android.tv.immich.album
 
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
+import android.graphics.LinearGradient
+import android.graphics.Shader
+import android.graphics.drawable.PaintDrawable
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RectShape
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.format.DateFormat
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +39,7 @@ import nl.giejay.android.tv.immich.shared.prefs.PreferenceManager
 import nl.giejay.android.tv.immich.shared.prefs.UiStyle
 import nl.giejay.android.tv.immich.shared.util.currentApiClient
 import nl.giejay.android.tv.immich.ui.FocusCardView
+import nl.giejay.android.tv.immich.ui.UiFormat
 import nl.giejay.android.tv.immich.ui.UiStyleProvider
 import nl.giejay.android.tv.immich.ui.UiTokens
 import timber.log.Timber
@@ -41,8 +47,9 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * Albums page: the cover of the focused album fills the screen below the title (dark gradients
- * left / bottom / top for legibility), with name, date and count over it, and a row of album
+ * Albums page. Apple: the latest album as a fixed hero with "My Albums" / "Shared Albums" rows
+ * ([AppleAlbumsView]). Google TV: the cover of the focused album fills the screen below the title
+ * (gradients fade it into the background), with name, date and count over it, and one row of album
  * cards at the very bottom.
  */
 class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapterProvider {
@@ -50,88 +57,126 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
     private val mMainFragmentAdapter = BrowseSupportFragment.MainFragmentAdapter(this)
 
     private lateinit var tokens: UiTokens
-    private lateinit var heroImage: ImageView
-    private lateinit var heroName: TextView
-    private lateinit var heroMeta: TextView
-    private lateinit var cardsGrid: HorizontalGridView
+    private var heroImage: ImageView? = null
+    private var heroLabel: TextView? = null
+    private var heroName: TextView? = null
+    private var heroMeta: TextView? = null
+    private var cardsGrid: HorizontalGridView? = null
     private val handler = Handler(Looper.getMainLooper())
     private var pendingHero: Runnable? = null
     private var shownHeroId: String? = null
+    private var latestAlbumId: String? = null
+    private var appleView: AppleAlbumsView? = null
 
     override fun getMainFragmentAdapter(): BrowseSupportFragment.MainFragmentAdapter<AlbumsHeroFragment> {
         return mMainFragmentAdapter
     }
 
-    private var appleView: AppleAlbumsView? = null
+    private fun openAlbum(album: Album) {
+        findNavController().navigate(
+            HomeFragmentDirections.actionHomeFragmentToAlbumDetailsFragment(album.id, album.albumName)
+        )
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         tokens = UiStyleProvider.current()
         val ctx = requireContext()
         if (tokens.style == UiStyle.APPLE) {
             // Apple: latest album as a fixed hero, "My Albums" / "Shared Albums" rows (apple-05)
-            return AppleAlbumsView(ctx, tokens) { album ->
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToAlbumDetailsFragment(album.id, album.albumName)
-                )
-            }.also { appleView = it }
+            return AppleAlbumsView(ctx, tokens) { openAlbum(it) }.also { appleView = it }
         }
+        return buildGoogleView()
+    }
+
+    // ----- Google TV (googletv-05) -----
+
+    private fun buildGoogleView(): View {
+        val ctx = requireContext()
+        fun dp(v: Int) = UiStyleProvider.dp(ctx, v)
         val root = FrameLayout(ctx)
         root.setBackgroundColor(tokens.bg)
-        val topOffset = UiStyleProvider.dp(ctx, 65)
+        root.clipChildren = false
 
-        heroImage = ImageView(ctx)
-        heroImage.scaleType = ImageView.ScaleType.CENTER_CROP
-        root.addView(heroImage, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
-            topMargin = topOffset
+        // cover from y=130px to the bottom, faded into the background by three gradients
+        val heroTop = dp(65)
+        val image = ImageView(ctx)
+        image.scaleType = ImageView.ScaleType.CENTER_CROP
+        root.addView(image, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
+            topMargin = heroTop
         })
+        heroImage = image
 
-        // legibility gradients: left, bottom and top fade into the background
-        fun overlay(orientation: GradientDrawable.Orientation, vararg colors: Int): View {
+        fun bgAlpha(a: Float) = (tokens.bg and 0x00FFFFFF) or ((a * 255).toInt() shl 24)
+        fun fade(horizontal: Boolean, colors: IntArray, stops: FloatArray) {
             val v = View(ctx)
-            v.background = GradientDrawable(orientation, colors)
+            v.background = PaintDrawable().apply {
+                shape = RectShape()
+                shaderFactory = object : ShapeDrawable.ShaderFactory() {
+                    override fun resize(width: Int, height: Int): Shader =
+                        if (horizontal) LinearGradient(0f, 0f, width.toFloat(), 0f, colors, stops, Shader.TileMode.CLAMP)
+                        else LinearGradient(0f, 0f, 0f, height.toFloat(), colors, stops, Shader.TileMode.CLAMP)
+                }
+            }
             root.addView(v, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
-                topMargin = topOffset
+                topMargin = heroTop
             })
-            return v
         }
-        fun alpha(a: Float) = (tokens.bg and 0x00FFFFFF) or ((a * 255).toInt() shl 24)
-        overlay(GradientDrawable.Orientation.LEFT_RIGHT, alpha(0.92f), alpha(0.45f), alpha(0.1f))
-        overlay(GradientDrawable.Orientation.BOTTOM_TOP, alpha(1f), alpha(0.75f), Color.TRANSPARENT)
-        overlay(GradientDrawable.Orientation.TOP_BOTTOM, alpha(1f), Color.TRANSPARENT)
+        // 90deg: rgba(bg,.92) -> .45 at 50% -> .1
+        fade(true, intArrayOf(bgAlpha(0.92f), bgAlpha(0.45f), bgAlpha(0.1f)), floatArrayOf(0f, 0.5f, 1f))
+        // 0deg (bottom up): bg -> .75 at 30% -> transparent at 60%; expressed top down
+        fade(false, intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT, bgAlpha(0.75f), tokens.bg), floatArrayOf(0f, 0.4f, 0.7f, 1f))
+        // 180deg: bg at the top -> transparent at 14%
+        fade(false, intArrayOf(tokens.bg, Color.TRANSPARENT, Color.TRANSPARENT), floatArrayOf(0f, 0.14f, 1f))
 
-        val padH = UiStyleProvider.dp(ctx, tokens.contentPaddingHDp)
-
+        val padH = dp(tokens.contentPaddingHDp)
         val title = TextView(ctx)
         title.text = "Albums"
+        title.includeFontPadding = false
         UiStyleProvider.applyTitle(title, tokens)
         root.addView(title, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             leftMargin = padH
-            topMargin = UiStyleProvider.dp(ctx, tokens.contentPaddingTopDp)
+            topMargin = dp(tokens.contentPaddingTopDp)
         })
 
+        // left 80px, top 250px: label (accent), name (80px), "Aug 2026 · 214 photos"
         val info = LinearLayout(ctx)
         info.orientation = LinearLayout.VERTICAL
-        heroName = TextView(ctx)
-        UiStyleProvider.applyTitle(heroName, tokens, 30f)
-        heroName.maxLines = 2
-        info.addView(heroName)
-        heroMeta = TextView(ctx)
-        UiStyleProvider.applyBody(heroMeta, tokens, 14f, tokens.dim)
-        info.addView(heroMeta)
-        root.addView(info, FrameLayout.LayoutParams(UiStyleProvider.dp(ctx, 380), ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+        val label = TextView(ctx)
+        label.includeFontPadding = false
+        UiStyleProvider.applyBody(label, tokens, 13f, tokens.accent)
+        label.typeface = UiStyleProvider.titleTypeface(tokens)
+        info.addView(label)
+        val name = TextView(ctx)
+        name.includeFontPadding = false
+        UiStyleProvider.applyTitle(name, tokens, 40f)
+        name.letterSpacing = -0.02f
+        name.maxLines = 2
+        name.ellipsize = TextUtils.TruncateAt.END
+        info.addView(name, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(5) })
+        val meta = TextView(ctx)
+        meta.includeFontPadding = false
+        UiStyleProvider.applyBody(meta, tokens, 14f, tokens.dim)
+        info.addView(meta, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(7) })
+        root.addView(info, FrameLayout.LayoutParams(dp(420), ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             leftMargin = padH
-            topMargin = UiStyleProvider.dp(ctx, 125)
+            topMargin = dp(125)
         })
+        heroLabel = label
+        heroName = name
+        heroMeta = meta
 
-        cardsGrid = HorizontalGridView(ctx)
-        cardsGrid.setItemSpacing(UiStyleProvider.dp(ctx, 12))
-        cardsGrid.clipChildren = false
-        cardsGrid.clipToPadding = false
-        cardsGrid.setPadding(padH, UiStyleProvider.dp(ctx, 10), padH, UiStyleProvider.dp(ctx, 10))
-        root.addView(cardsGrid, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, UiStyleProvider.dp(ctx, 150)).apply {
+        // row of cards at the very bottom: left 80px, bottom 48px, 28px between cards
+        val grid = HorizontalGridView(ctx)
+        grid.setItemSpacing(dp(14))
+        grid.clipChildren = false
+        grid.clipToPadding = false
+        grid.setPadding(padH, dp(10), padH, 0)
+        root.addView(grid, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(190)).apply {
             gravity = Gravity.BOTTOM
-            bottomMargin = UiStyleProvider.dp(ctx, 16)
+            // the texts end 48px above the bottom edge in the mockup
+            bottomMargin = -dp(4)
         })
+        cardsGrid = grid
         return root
     }
 
@@ -147,59 +192,47 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
         albums
     }
 
-    /** Apple: own albums show up as soon as they arrive, the (slower) shared list follows. */
-    private fun loadAppleAlbums(client: nl.giejay.android.tv.immich.api.ApiClient) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val mine = withContext(Dispatchers.IO) { client.listMyAlbums() }
-            val view = appleView ?: return@launch
-            mine.fold({ Timber.e("Could not load albums: $it") }, { albums ->
-                view.setMyAlbums(sortAlbums(albums))
-                // the most recent album (date of its newest photo), whatever the sorting of the rows;
-                // empty albums have no cover, so they cannot be the hero
-                albums.filter { it.assetCount > 0 && it.albumThumbnailAssetId != null }
-                    .maxByOrNull { (it.endDate ?: it.updatedAt).time }
-                    ?.let { view.showHero(it) }
-            })
-            val shared = withContext(Dispatchers.IO) { client.listSharedAlbums() }
-            val mineIds = (mine.getOrNull() ?: emptyList()).map { it.id }.toSet()
-            shared.fold({ Timber.e("Could not load shared albums: $it") }, { albums ->
-                appleView?.setSharedAlbums(sortAlbums(albums.filter { it.id !in mineIds }))
-            })
-        }
-    }
+    /** The most recent album (date of its newest photo); empty albums have no cover. */
+    private fun latestOf(albums: List<Album>): Album? =
+        albums.filter { it.assetCount > 0 && it.albumThumbnailAssetId != null }
+            .maxByOrNull { (it.endDate ?: it.updatedAt).time }
 
     private fun loadAlbums() {
         val client = currentApiClient() ?: return
-        if (appleView != null) {
-            loadAppleAlbums(client)
-            return
-        }
         viewLifecycleOwner.lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) { client.listAlbums() }
-            result.fold(
-                { Timber.e("Could not load albums: $it") },
-                { albums ->
-                    val sorted = try {
-                        albums.sortedWith(PreferenceManager.get(ALBUMS_SORTING).sort)
-                    } catch (e: IllegalArgumentException) {
-                        albums
-                    }
-                    showAlbums(sorted)
-                }
-            )
+            val mine = withContext(Dispatchers.IO) { client.listMyAlbums() }
+            val mineList = mine.getOrNull()
+            if (mineList == null) {
+                Timber.e("Could not load albums")
+                return@launch
+            }
+            val apple = appleView
+            if (apple != null) {
+                // Apple: own albums show up as soon as they arrive, the (slower) shared list follows
+                apple.setMyAlbums(sortAlbums(mineList))
+                latestOf(mineList)?.let { apple.showHero(it) }
+                val shared = withContext(Dispatchers.IO) { client.listSharedAlbums() }
+                val mineIds = mineList.map { it.id }.toSet()
+                shared.getOrNull()?.let { list -> appleView?.setSharedAlbums(sortAlbums(list.filter { it.id !in mineIds })) }
+            } else {
+                // Google TV: one row, own albums first, then the shared ones not already in it
+                showGoogleAlbums(sortAlbums(mineList))
+                val shared = withContext(Dispatchers.IO) { client.listSharedAlbums() }
+                val mineIds = mineList.map { it.id }.toSet()
+                val extra = shared.getOrNull()?.filter { it.id !in mineIds }.orEmpty()
+                if (extra.isNotEmpty() && isAdded) showGoogleAlbums(sortAlbums(mineList + extra))
+            }
         }
     }
 
-    private fun showAlbums(albums: List<Album>) {
+    private fun showGoogleAlbums(albums: List<Album>) {
+        val grid = cardsGrid ?: return
         if (!isAdded || view == null || albums.isEmpty()) return
-        val presenter = AlbumCardPresenter(tokens, { album -> scheduleHero(album) }, { album ->
-            findNavController().navigate(
-                HomeFragmentDirections.actionHomeFragmentToAlbumDetailsFragment(album.id, album.albumName)
-            )
-        })
+        latestAlbumId = latestOf(albums)?.id
+        val presenter = GoogleAlbumCardPresenter(tokens, { album -> scheduleHero(album) }, { album -> openAlbum(album) })
         val adapter = ArrayObjectAdapter(presenter)
         adapter.addAll(0, albums)
-        cardsGrid.adapter = ItemBridgeAdapter(adapter)
+        grid.adapter = ItemBridgeAdapter(adapter)
         showHero(albums.first())
     }
 
@@ -211,21 +244,19 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
     }
 
     private fun showHero(album: Album) {
+        val image = heroImage ?: return
         if (!isAdded || shownHeroId == album.id) return
         shownHeroId = album.id
-        heroName.text = album.albumName
+        // the label only makes sense for the latest album
+        heroLabel?.text = if (album.id == latestAlbumId) "Latest album" else ""
+        heroName?.text = album.albumName
         val locale = Locale.getDefault(Locale.Category.FORMAT)
         val date = (album.endDate ?: album.updatedAt)?.let {
-            SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, "MMMMyyyy"), locale).format(it)
+            SimpleDateFormat(DateFormat.getBestDateTimePattern(locale, "MMMyyyy"), locale).format(it)
         }
-        val count = "${album.assetCount} photos"
-        heroMeta.text = listOfNotNull(date, count).joinToString("  ·  ")
+        heroMeta?.text = listOfNotNull(date, "${UiFormat.count(album.assetCount)} ${if (album.assetCount == 1) "photo" else "photos"}").joinToString(" · ")
         val url = ApiUtil.getThumbnailUrl(album.albumThumbnailAssetId, "preview")
-        if (url != null) {
-            Glide.with(this).load(url).centerCrop().into(heroImage)
-        } else {
-            heroImage.setImageDrawable(null)
-        }
+        if (url != null) Glide.with(this).load(url).centerCrop().into(image) else image.setImageDrawable(null)
     }
 
     override fun onDestroyView() {
@@ -233,69 +264,81 @@ class AlbumsHeroFragment : Fragment(), BrowseSupportFragment.MainFragmentAdapter
         pendingHero?.let { handler.removeCallbacks(it) }
         shownHeroId = null
         appleView = null
+        heroImage = null
+        heroLabel = null
+        heroName = null
+        heroMeta = null
+        cardsGrid = null
     }
 }
 
-/** Album card of the bottom row: cover, name and count. */
-private class AlbumCardPresenter(
+/** Album card of the Google TV row: 340x220px cover (14px corners), name and count below it. */
+private class GoogleAlbumCardPresenter(
     private val tokens: UiTokens,
     private val onFocused: (Album) -> Unit,
     private val onClicked: (Album) -> Unit
 ) : Presenter() {
 
+    private class Parts(val cover: FocusCardView, val image: ImageView, val name: TextView, val count: TextView)
+
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
         val ctx = parent.context
-        val card = FocusCardView(ctx, tokens)
-        val w = UiStyleProvider.dp(ctx, 120)
-        card.layoutParams = ViewGroup.MarginLayoutParams(w, UiStyleProvider.dp(ctx, 120))
-        card.setBackgroundColor(tokens.pillBg)
+        fun dp(v: Int) = UiStyleProvider.dp(ctx, v)
+        val card = LinearLayout(ctx)
+        card.orientation = LinearLayout.VERTICAL
+        card.clipChildren = false
+        card.layoutParams = ViewGroup.MarginLayoutParams(dp(170), ViewGroup.LayoutParams.WRAP_CONTENT)
 
+        val cover = FocusCardView(ctx, tokens, radiusDp = 7f)
+        cover.setBackgroundColor(tokens.pillBg)
         val image = ImageView(ctx)
-        image.id = View.generateViewId()
         image.scaleType = ImageView.ScaleType.CENTER_CROP
-        card.addView(image, FrameLayout.LayoutParams(w, UiStyleProvider.dp(ctx, 76)))
+        cover.addView(image, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        card.addView(cover, LinearLayout.LayoutParams(dp(170), dp(110)))
 
-        val texts = LinearLayout(ctx)
-        texts.orientation = LinearLayout.VERTICAL
-        texts.setPadding(UiStyleProvider.dp(ctx, 8), UiStyleProvider.dp(ctx, 4), UiStyleProvider.dp(ctx, 8), 0)
         val name = TextView(ctx)
-        UiStyleProvider.applyBody(name, tokens, 13f, tokens.text)
+        name.includeFontPadding = false
         name.setSingleLine(true)
+        name.ellipsize = TextUtils.TruncateAt.END
+        UiStyleProvider.applyBody(name, tokens, 13f, tokens.text)
+        card.addView(name, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(7) })
         val count = TextView(ctx)
-        UiStyleProvider.applyBody(count, tokens, 13f, tokens.dim)
+        count.includeFontPadding = false
         count.setSingleLine(true)
-        texts.addView(name)
-        texts.addView(count)
-        card.addView(texts, FrameLayout.LayoutParams(w, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-            topMargin = UiStyleProvider.dp(ctx, 76)
-        })
-        card.tag = arrayOf<Any>(image, name, count)
+        UiStyleProvider.applyBody(count, tokens, 12f, tokens.dim)
+        card.addView(count, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(1) })
+
+        // the focused cover grows ~4dp: the texts follow it and the name turns bold
+        cover.setOnFocusChangeListener { _, focused ->
+            val shift = if (focused) dp(4).toFloat() else 0f
+            name.animate().translationY(shift).setDuration(120).start()
+            count.animate().translationY(shift).setDuration(120).start()
+            name.typeface = if (focused) UiStyleProvider.titleTypeface(tokens) else UiStyleProvider.bodyTypeface(tokens)
+        }
+        card.tag = Parts(cover, image, name, count)
         return ViewHolder(card)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
         val album = item as? Album ?: return
-        val card = viewHolder.view as FocusCardView
-        @Suppress("UNCHECKED_CAST")
-        val parts = card.tag as Array<Any>
-        val image = parts[0] as ImageView
-        (parts[1] as TextView).text = album.albumName
-        (parts[2] as TextView).text = "${album.assetCount}"
-        val url = ApiUtil.getThumbnailUrl(album.albumThumbnailAssetId, "thumbnail")
-        if (url != null) Glide.with(image).asBitmap().load(url).centerCrop().into(image) else image.setImageDrawable(null)
-        card.onFocusGained = { onFocused(album) }
-        card.setOnClickListener { onClicked(album) }
+        val p = viewHolder.view.tag as Parts
+        p.name.text = album.albumName
+        p.count.text = "${UiFormat.count(album.assetCount)} ${if (album.assetCount == 1) "photo" else "photos"}"
+        val url = ApiUtil.getThumbnailUrl(album.albumThumbnailAssetId, "preview")
+        if (url != null) Glide.with(p.image).asBitmap().load(url).centerCrop().into(p.image) else p.image.setImageDrawable(null)
+        p.cover.onFocusGained = { onFocused(album) }
+        p.cover.setOnClickListener { onClicked(album) }
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {
-        val card = viewHolder.view as FocusCardView
-        card.resetFocusState()
-        card.onFocusGained = null
-        card.setOnClickListener(null)
-        @Suppress("UNCHECKED_CAST")
-        val parts = card.tag as Array<Any>
+        val p = viewHolder.view.tag as Parts
+        p.cover.resetFocusState()
+        p.cover.onFocusGained = null
+        p.cover.setOnClickListener(null)
+        p.name.translationY = 0f
+        p.count.translationY = 0f
         try {
-            Glide.with(parts[0] as ImageView).clear(parts[0] as ImageView)
+            Glide.with(p.image).clear(p.image)
         } catch (e: IllegalArgumentException) {
             Timber.e(e)
         }
