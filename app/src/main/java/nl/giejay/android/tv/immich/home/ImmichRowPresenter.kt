@@ -56,7 +56,17 @@ class ImmichRowPresenter : Presenter() {
         viewHolder.tvTitle.textSize = if (tokens.style == UiStyle.GOOGLE_TV) 13.5f else tokens.bodySizeSp
         updateIconTint(viewHolder, tokens.style, false)
         viewHolder.count.typeface = UiStyleProvider.bodyTypeface(tokens)
-        viewHolder.count.setTextColor(tokens.dim)
+        if (tokens.style == UiStyle.GOOGLE_TV) {
+            // dim on the dark drawer, dark on the white pill of the focused row
+            viewHolder.count.isDuplicateParentStateEnabled = true
+            viewHolder.count.setTextColor(android.content.res.ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(android.R.attr.state_focused), intArrayOf()),
+                intArrayOf((tokens.selectedRowText and 0x00FFFFFF) or 0xBF000000.toInt(), (tokens.selectedRowText and 0x00FFFFFF) or 0xBF000000.toInt(), tokens.dim)
+            ))
+            (viewHolder.count.layoutParams as? ViewGroup.MarginLayoutParams)?.marginStart = UiStyleProvider.dp(context, 14)
+        } else {
+            viewHolder.count.setTextColor(tokens.dim)
+        }
 
         // the title is the focusable view, the whole row (root) shows the highlight
         viewHolder.tvTitle.setOnFocusChangeListener { _, hasFocus ->

@@ -182,7 +182,6 @@ class HomeFragment : BrowseSupportFragment() {
                     if (index >= 0) mRowsAdapter.notifyArrayItemRangeChanged(index, 1)
                 }
             }
-            return
         }
         viewLifecycleOwner.lifecycleScope.launch {
             val stats = withContext(Dispatchers.IO) { client.assetStatistics() }
