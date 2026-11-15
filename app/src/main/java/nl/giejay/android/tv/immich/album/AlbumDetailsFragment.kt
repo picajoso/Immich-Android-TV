@@ -19,6 +19,13 @@ class AlbumDetailsFragment : GenericAssetFragment() {
     lateinit var albumName: String
     private var pageToBucket: Map<Int, String>? = null
 
+    /** Redesigned photo grid: the album name is the title, "Albums" the breadcrumb above it. */
+    override val gridTitle: String?
+        get() = AlbumDetailsFragmentArgs.fromBundle(requireArguments()).albumName
+
+    override val photoGridBreadcrumb: String?
+        get() = nl.giejay.android.tv.immich.shared.util.Tr.t("Albums")
+
     override fun getFilterKey(): EnumByTitlePref<ContentType> {
         val args = AlbumDetailsFragmentArgs.fromBundle(requireArguments())
         albumId = args.albumId
