@@ -22,3 +22,6 @@ service-account-key.json
 
 # compiled apps are published as GitHub Releases, not committed
 *.apk
+
+# personal device details (addresses, serials): never committed
+DEVICES.local.md

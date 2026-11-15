@@ -21,9 +21,22 @@ module `mediaslider/` is Apache-2.0 (descends from Zeuskartik/MediaSliderView vi
   The branch `old-favorites-work` in that repo keeps an older unmerged favourites-sync attempt.
 
 ## Working on the real TV (what worked)
-- adb over Wi-Fi (`adb pair ip:port code`, then `adb connect ip:port`; restart the adb server if
-  pairing answers "protocol fault"). Screens: `adb exec-out screencap -p`. Keys: `adb shell input
-  keyevent KEYCODE_DPAD_*`; text: `adb shell input text`.
+- **Connecting to a TV over Wi-Fi (adb):**
+  1. On the TV: Developer options › Wireless debugging › "Pair device with pairing code". Keep that
+     screen open; it shows an IP:port and a 6-digit code, and both expire when it closes.
+  2. `adb pair <ip:port> <code>` (once per computer). If it answers "protocol fault", run
+     `adb kill-server && adb start-server` and retry.
+  3. The debugging port on the main screen is a different one: find it with `adb mdns services`
+     (`_adb-tls-connect._tcp`) and run `adb connect <ip:port>`. Check with `adb devices` that it says
+     `device` (not `unauthorized` or `offline`).
+  4. Fire TV (Android-based, not Google TV): enable ADB debugging in Developer options and accept
+     "Always allow" on the TV when prompted. Its debugging port is not always advertised; if it is
+     not in `adb mdns services`, check the TV's network IP in its settings.
+  5. Install: `adb -s <ip:port> install -r <file.apk>`; check with `adb -s <ip:port> shell pm list packages`.
+  Device addresses and serials change and belong to the machine, not the repo: keep them in
+  `DEVICES.local.md` (git-ignored).
+  Screens: `adb -s <ip:port> exec-out screencap -p`. Keys: `adb shell input keyevent KEYCODE_DPAD_*`;
+  text: `adb shell input text`.
 - Density 320 on a 1080p TV → **1 mockup px = 0.5 dp**.
 - Switch style without the UI: edit `ui_style` (`APPLE` | `GOOGLE_TV`) in the debug app's shared
   prefs with `run-as javipas.android.tv.immich.debug`, then restart the app. Locale:
