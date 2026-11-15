@@ -61,7 +61,10 @@ class OnThisDayBrowseFragment : PhotoRowsFragment() {
                     emptyList<Asset>()
                 },
                 { it }
-            ).also { if (it.isNotEmpty()) nl.giejay.android.tv.immich.shared.cache.SwrCache.writeList(cacheKey, it) }
+            ).also {
+                // never keep a result that lost years to failed requests: it would stay wrong all day
+                if (it.isNotEmpty() && !client.onThisDayIncomplete) nl.giejay.android.tv.immich.shared.cache.SwrCache.writeList(cacheKey, it)
+            }
         val byYear = assets.groupBy { yearOf(it) }
 
         return (0..yearsBack).mapNotNull { offset ->

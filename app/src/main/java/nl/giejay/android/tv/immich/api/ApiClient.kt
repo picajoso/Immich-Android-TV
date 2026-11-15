@@ -185,12 +185,18 @@ class ApiClient(private val config: ApiClientConfig) {
         if (map.all { it.isLeft() }) {
             return map.first()
         }
+        onThisDayIncomplete = map.any { it.isLeft() }
         return Either.Right(map.flatMap { it.getOrElse { emptyList() } }.shuffled())
     }
 
     private fun getDateFromAsset(asset: Asset): Date? {
         return asset.exifInfo?.dateTimeOriginal ?: asset.fileModifiedAt
     }
+
+    /** True when the last [onThisDayAssets] call lost at least one year to a failed request. */
+    @Volatile
+    var onThisDayIncomplete: Boolean = false
+        private set
 
     suspend fun onThisDayAssets(
         page: Int,
